@@ -1,0 +1,8 @@
+# Editor scratch files.
+\#*
+*~
+
+# Derived Rex and Racc files.
+*.rex.rb
+*.tab.rb
+*.output
