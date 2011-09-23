@@ -1,0 +1,6 @@
+require 'pedant/check'
+require 'pedant/cli'
+require 'pedant/command'
+require 'pedant/nasl'
+require 'pedant/parser'
+require 'pedant/test'
