@@ -31,7 +31,7 @@ module Pedant
     @@levels = [:error, :warn, :info]
 
     def self.initialize!
-      Dir.glob(Pedant.lib + "pedant/checks/*.rb").each { |f| load(f) }
+      Dir.glob(Pedant.lib + 'pedant/checks/*.rb').each { |f| load(f) }
     end
 
     def self.all
@@ -70,7 +70,7 @@ module Pedant
 
     def name
       # Mangle the classes name to be more user-friendly.
-      self.class.name.gsub(/.*::/, "").gsub(/^Check/, "").gsub(/([A-Z][^A-Z]*)/, ' \1').strip
+      self.class.name.gsub(/.*::/, '').gsub(/^Check/, '').gsub(/([A-Z][^A-Z]*)/, ' \1').strip
     end
 
     def fail
@@ -96,12 +96,12 @@ module Pedant
 
     def result
       status = {
-        :died => "DIED".color(:red),
-        :fail => "FAIL".color(:red),
-        :pass => "PASS".color(:green),
-        :skip => "SKIP".color(:green),
-        :warn => "WARN".color(:yellow),
-        :void => "VOID".color(:magenta)
+        :died => 'DIED'.color(:red),
+        :fail => 'FAIL'.color(:red),
+        :pass => 'PASS'.color(:green),
+        :skip => 'SKIP'.color(:green),
+        :warn => 'WARN'.color(:yellow),
+        :void => 'VOID'.color(:magenta)
       }
 
       "[#{status[@result]}] #{self.name}"

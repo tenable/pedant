@@ -27,7 +27,7 @@
 module Pedant
   class CommandTest < Command
     def self.binding
-      "test"
+      'test'
     end
 
     def self.run(cfg, args)

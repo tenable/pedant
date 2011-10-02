@@ -27,7 +27,7 @@
 module Pedant
   class Command
     def self.initialize!
-      Dir.glob(Pedant.lib + "pedant/commands/*.rb").each {|f| load(f)}
+      Dir.glob(Pedant.lib + 'pedant/commands/*.rb').each {|f| load(f)}
     end
 
     def self.all
@@ -55,8 +55,8 @@ module Pedant
 
       # Create bars on either side.
       leftover = (width - middle.length) / 2
-      left = "-" * leftover.floor
-      right = "-" * leftover.ceil
+      left = '-' * leftover.floor
+      right = '-' * leftover.ceil
 
       left + middle + right
     end

@@ -27,7 +27,7 @@
 module Pedant
   class CommandParse < Command
     def self.binding
-      "parse"
+      'parse'
     end
 
     def self.analyze(cfg, path, args)

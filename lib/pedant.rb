@@ -30,20 +30,20 @@ require 'nasl'
 
 module Pedant
   def self.root
-    @root ||= Pathname.new("").expand_path
+    @root ||= Pathname.new('').expand_path
   end
 
   def self.lib
-    root + "lib"
+    root + 'lib'
   end
 
   def self.test
-    root + "test"
+    root + 'test'
   end
 
-  autoload :Check,   "pedant/check"
-  autoload :Cli,     "pedant/cli"
-  autoload :Command, "pedant/command"
+  autoload :Check,   'pedant/check'
+  autoload :Cli,     'pedant/cli'
+  autoload :Command, 'pedant/command'
 end
 
 $LOAD_PATH.unshift(Pedant.lib.to_s)

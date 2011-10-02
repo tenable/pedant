@@ -27,7 +27,7 @@
 module Pedant
   class CommandCheck < Command
     def self.binding
-      "check"
+      'check'
     end
 
     def self.analyze(cfg, path, args)
