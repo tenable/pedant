@@ -24,10 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_helper'
 
 class TestIp < Test::Unit::TestCase
-  include Pedant::Test
 
   def test_ip
     pass('q = 1.1.1.1;');

@@ -24,11 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_helper'
 
 class TestReturn < Test::Unit::TestCase
-  include Pedant::Test
-
   def test_blank
     fail(%q|return()|)
     fail(%q|return();|)

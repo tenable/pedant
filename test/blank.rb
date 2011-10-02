@@ -24,10 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_unit'
 
 class TestBlank < Test::Unit::TestCase
-  include Pedant::Test
 
   def test_blank
     same(

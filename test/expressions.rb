@@ -24,10 +24,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
-
+require 'test_helper'
 class TestExpressions < Test::Unit::TestCase
-  include Pedant::Test
 
   def test_parentheses
     pass("q = (-a);")

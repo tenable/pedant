@@ -24,10 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_helper'
 
 class TestConstant < Test::Unit::TestCase
-  include Pedant::Test
 
   def test_false
     diff(

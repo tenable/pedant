@@ -24,11 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_helper'
 
 class TestInclude < Test::Unit::TestCase
-  include Pedant::Test
-
   def test_inc
     fail(%q|include ();|)
     pass(%q|include ('');|)

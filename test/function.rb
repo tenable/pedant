@@ -24,10 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'test/unit'
+require 'test_helper'
 
 class TestFunction < Test::Unit::TestCase
-  include Pedant::Test
 
   def test_keyword_prefix
     # While we never want to have a function with the same name as a keyword,
