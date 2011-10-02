@@ -25,6 +25,8 @@
 ################################################################################
 
 require 'pathname'
+require 'rainbow'
+require 'nasl'
 
 module Pedant
   def self.root
@@ -42,9 +44,6 @@ module Pedant
   autoload :Check,   "pedant/check"
   autoload :Cli,     "pedant/cli"
   autoload :Command, "pedant/command"
-  autoload :Nasl,    "pedant/nasl"
-  autoload :Parser,  "pedant/parser"
-  autoload :Test,    "pedant/test"
 end
 
 $LOAD_PATH.unshift(Pedant.lib.to_s)
