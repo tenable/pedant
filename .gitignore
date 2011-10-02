@@ -1,13 +1,10 @@
+# Ruby gems files.
 *.gem
 .bundle
 Gemfile.lock
 pkg/*
 
-#Editor scratch files.
+# Editor scratch files.
 \#*
 *~
-
-# Derived Rex and Racc Files
-*.rex.rb
-*.tab.rb
-*.output
+*.swp
