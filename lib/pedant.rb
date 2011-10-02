@@ -24,9 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
+require 'nasl'
 require 'pathname'
 require 'rainbow'
-require 'nasl'
 
 module Pedant
   def self.root
