@@ -24,8 +24,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'lib/pedant/parser'
-
 module Pedant
   class CheckContainsUnreachableCode < Check
     def initialize

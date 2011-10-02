@@ -1,8 +1,13 @@
-# Editor scratch files.
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+
+#Editor scratch files.
 \#*
 *~
 
-# Derived Rex and Racc files.
+# Derived Rex and Racc Files
 *.rex.rb
 *.tab.rb
 *.output

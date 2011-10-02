@@ -24,8 +24,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-require 'rainbow'
-
 module Pedant
   class Check
     attr_reader :result
