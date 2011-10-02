@@ -22,7 +22,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest'
 
   s.add_runtime_dependency 'rainbow'
-  s.add_runtime_dependency 'builder'
-  s.add_runtime_dependency 'rex'
-  s.add_runtime_dependency 'racc'
+  s.add_runtime_dependency 'nasl'
 end
