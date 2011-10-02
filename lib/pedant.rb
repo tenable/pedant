@@ -25,6 +25,7 @@
 ################################################################################
 
 require 'pathname'
+require 'racc/parser'
 
 module Pedant
   def self.root
