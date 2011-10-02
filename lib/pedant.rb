@@ -26,6 +26,7 @@
 
 require 'pathname'
 require 'rainbow'
+require 'nasl'
 
 module Pedant
   def self.root
