@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Mak Kolybabi']
   s.email       = ['mak@kolybabi.com']
   s.homepage    = 'http://github.com/mogigoma/pedant'
-  s.summary     = %q{A static analysis framework for NASL.}
+  s.summary     = %q{A static analysis framework for the Nessus Attack Scripting Language.}
 
   s.rubyforge_project = 'pedant'
 
