@@ -29,11 +29,11 @@ module Pedant
     def initialize
       super
 
-      @requires << :contents
+      @requires << :codes
     end
 
-    def check(file, contents)
-      return if contents[-1] == 0x0A
+    def check(file, code)
+      return unless code[-1] != 0x0A
 
       report(:warn, "#{file} does not end with a newline.")
       warn
@@ -43,8 +43,8 @@ module Pedant
       # This check will pass by default.
       pass
 
-      # Run this check on the contents of every file.
-      kb[:contents].each { |file, contents| check(file, contents) }
+      # Run this check on the code in every file.
+      kb[:codes].each { |file, code| check(file, code) }
     end
   end
 end

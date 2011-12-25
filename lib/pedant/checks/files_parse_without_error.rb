@@ -32,7 +32,7 @@ module Pedant
       @requires << :base
       @requires << :main
 
-      @provides << :contents
+      @provides << :codes
       @provides << :trees
     end
 
@@ -48,12 +48,12 @@ module Pedant
 
         # Mark a placeholder key in the KB for this file. This will prevent us
         # from trying to parse a library more than once if there is a failure.
-        kb[:contents][file] = :pending
+        kb[:codes][file] = :pending
         kb[:trees][file] = :pending
 
         begin
           contents = File.open(path, "rb").read
-          kb[:contents][file] = contents
+          kb[:codes][file] = contents
           report(:info, "Read contents of #{path}.")
         rescue
           report(:error, "Failed to read contents #{path}.")
@@ -61,10 +61,12 @@ module Pedant
         end
 
         begin
-          tree = Nasl::Parser.new.parse(contents)
+          tree = Nasl::Parser.new.parse(contents, path)
           kb[:trees][file] = tree
           report(:info, "Parsed contents of #{path}.")
-        rescue Racc::ParseError => e
+        rescue
+          # XXX-MAK: Incorporate the error from the parser, as it gives full,
+          # coloured context.
           report(:error, "Failed to parse #{path}.")
           return fatal
         end
@@ -74,11 +76,13 @@ module Pedant
       pass
 
       # Initialize the keys written by this check.
-      kb[:contents] = {}
+      kb[:codes] = {}
       kb[:trees] = {}
 
       # Load up the main file.
       import(kb, kb[:main])
+
+      return
 
       while true
         # Get the list of all Includes, and prune any that have already had the

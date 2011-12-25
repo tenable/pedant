@@ -35,7 +35,7 @@ module Pedant
 
     def run(kb)
       # This check only applies to plugins.
-      return skip if kb[:main] !~ /.nasl$/
+      return skip unless kb[:main].extname == '.nasl'
 
       # This check will fail by default.
       fail
