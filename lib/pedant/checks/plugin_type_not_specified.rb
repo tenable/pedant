@@ -43,8 +43,8 @@ module Pedant
       tree = kb[:trees][kb[:main]]
 
       tree.all(:Call).each do |node|
-        next if node.name.name != 'script_set_attribute'
-        next if !node.arg.has_key? 'attribute'
+        next unless node.name.name == 'script_set_attribute'
+        next unless node.arg.has_key? 'attribute'
 
         # Pull out the attribute argument.
         arg = node.arg['attribute']
