@@ -76,7 +76,6 @@ module Pedant
       puts
       puts "Commands:"
       puts "    check    Runs all included checks against the specified plugin(s)."
-      puts "    parse    Dumps the parse tree of the specified plugin(s)."
       puts "    test     Runs the specified unit tests, all are selected by default."
     end
   end
