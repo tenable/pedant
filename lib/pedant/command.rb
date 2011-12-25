@@ -70,20 +70,26 @@ module Pedant
       # commands that don't require files to be declared should override this
       # method.
       if paths.empty?
-        puts "No directories, libraries, or plugins were specified."
+        puts "No directories (/), libraries (.inc), or plugins (.nasl) were specified."
         exit 1
       end
 
-      # Run the command on each path the user specified, being sure to separate
-      # them nicely in the output.
+      # Collect all the paths together, recursively.
+      dirents = []
       paths.each do |path|
         Pathname.new(path).find do |dirent|
           if dirent.file? && dirent.extname =~ /inc|nasl/
-            puts banner(dirent.basename)
-            analyze(cfg, dirent, args)
-            puts banner(dirent.basename)
+            dirents << dirent
           end
         end
+      end
+
+      # If the command is capable of handling all the paths at once, send them
+      # in a group, otherwise send them individually.
+      if self.respond_to? :analyze_all then
+        analyze_all(cfg, dirents, args)
+      else
+        dirents.each { |d| analyze(cfg, d, args) }
       end
     end
   end
