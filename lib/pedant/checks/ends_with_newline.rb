@@ -33,7 +33,7 @@ module Pedant
     end
 
     def check(file, code)
-      return unless code[-1] != 0x0A
+      return unless code[-1] == 0x0A
 
       report(:warn, "#{file} does not end with a newline.")
       warn
