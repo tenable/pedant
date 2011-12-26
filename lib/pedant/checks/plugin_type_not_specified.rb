@@ -40,6 +40,8 @@ module Pedant
       # This check will fail by default.
       fail
 
+      args = []
+
       tree = kb[:trees][kb[:main]]
 
       tree.all(:Call).each do |node|
@@ -51,13 +53,26 @@ module Pedant
         next if !arg.is_a? Nasl::String
         next if arg.text != 'plugin_type'
 
-        pass
-
         # Pull out the value argument.
         arg = node.arg['value']
         next if !arg.is_a? Nasl::String
 
-        report(:info, "Plugin is of type #{arg.text}.")
+        args << [arg, node]
+      end
+
+      case args.length
+      when 0
+        report(:error, "Plugin does not specify a type.")
+        fail
+      when 1
+        arg = args.first[0]
+        call = args.first[1]
+        report(:info, "Plugin is of type #{arg.text}:\n#{arg.context(call)}")
+        pass
+      else
+        report(:error, "Plugin specifies multiple types.")
+        args.each { |arg, call| report(:error, arg.context(call)) }
+        fail
       end
     end
   end
