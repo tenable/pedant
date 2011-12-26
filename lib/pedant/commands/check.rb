@@ -65,7 +65,7 @@ module Pedant
           # Display the results of the check.
           puts chk.result
           report = chk.report(cfg[:verbose])
-          puts report if !report.empty?
+          puts report unless report.empty?
         end
       end
 
