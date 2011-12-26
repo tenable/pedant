@@ -28,6 +28,15 @@ module Pedant
   class Check
     attr_reader :result
 
+    @@statuses = {
+      :died => 'DIED'.color(:red),
+      :fail => 'FAIL'.color(:red),
+      :pass => 'PASS'.color(:green),
+      :skip => 'SKIP'.color(:green),
+      :warn => 'WARN'.color(:yellow),
+      :void => 'VOID'.color(:magenta)
+    }
+
     @@levels = [:error, :warn, :info]
 
     def self.initialize!
@@ -40,6 +49,14 @@ module Pedant
 
     def self.inherited(cls)
       all << cls
+    end
+
+    def self.provides
+      return []
+    end
+
+    def self.requires
+      return []
     end
 
     def report(level, text=nil)
@@ -62,8 +79,8 @@ module Pedant
       @result = :void
     end
 
-    def ready?(res)
-      @requires.reduce(true) do |stat, req|
+    def self.ready?(res)
+      self.requires.reduce(true) do |stat, req|
         stat && res.has_key?(req)
       end
     end
@@ -95,16 +112,7 @@ module Pedant
     end
 
     def result
-      status = {
-        :died => 'DIED'.color(:red),
-        :fail => 'FAIL'.color(:red),
-        :pass => 'PASS'.color(:green),
-        :skip => 'SKIP'.color(:green),
-        :warn => 'WARN'.color(:yellow),
-        :void => 'VOID'.color(:magenta)
-      }
-
-      "[#{status[@result]}] #{self.name}"
+      "[#{@@statuses[@result]}] #{self.name}"
     end
   end
 end

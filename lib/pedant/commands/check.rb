@@ -33,8 +33,8 @@ module Pedant
     def self.analyze(cfg, path, args)
       Check.initialize!
 
-      # Create an instance of every registered check.
-      pending = Check.all.map &:new
+      # Get a list of every existing check.
+      pending = Check.all
 
       # Initialize the knowledge base where checks can store information for
       # other checks.
@@ -48,12 +48,15 @@ module Pedant
       fatal = false
       until pending.empty? || fatal
         # Find all of the checks that can run right now.
-        ready = pending.select { |chk| chk.ready?(kb) }
+        ready = pending.select { |cls| cls.ready?(kb) }
         break if ready.empty?
 
         # Run all of the checks that are ready.
-        ready.each do |chk|
-          pending.delete(chk)
+        ready.each do |cls|
+          # Create a new check instance.
+          chk = cls.new
+          pending.delete(cls)
+
           chk.run(kb)
 
           # Fatal errors mean that no further checks should be processed.
@@ -72,7 +75,7 @@ module Pedant
       # Notify the user if any checks did not run due to unsatisfied
       # dependencies or a fatal error occurring before they had the chance to
       # run.
-      pending.each { |chk| puts chk.result }
+      pending.each { |cls| puts cls.result }
     end
   end
 end

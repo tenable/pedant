@@ -26,11 +26,8 @@
 
 module Pedant
   class CheckPluginTypeNotSpecified < Check
-    def initialize
-      super
-
-      @requires << :main
-      @requires << :trees
+    def self.requires
+      super + [:main, :trees]
     end
 
     def run(kb)

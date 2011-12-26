@@ -26,14 +26,12 @@
 
 module Pedant
   class CheckFilesParseWithoutErrors < Check
-    def initialize
-      super
+    def self.requires
+      super + [:base, :main]
+    end
 
-      @requires << :base
-      @requires << :main
-
-      @provides << :codes
-      @provides << :trees
+    def provides
+      super + [:codes, :trees]
     end
 
     def run(kb)

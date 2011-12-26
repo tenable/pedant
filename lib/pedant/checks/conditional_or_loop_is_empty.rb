@@ -26,10 +26,8 @@
 
 module Pedant
   class CheckConditionalOrLoopIsEmpty < Check
-    def initialize
-      super
-
-      @requires << :trees
+    def self.requires
+      super + [:trees]
     end
 
     def check(file, tree)

@@ -26,10 +26,8 @@
 
 module Pedant
   class CheckContainsNoTabs < Check
-    def initialize
-      super
-
-      @requires << :codes
+    def self.requires
+      super + [:codes]
     end
 
     def check(file, code)
