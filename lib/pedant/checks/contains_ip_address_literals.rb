@@ -34,7 +34,9 @@ module Pedant
       return if tree.all(:Ip).empty?
 
       report(:warn, "IP address literals were found in #{file}.")
-      warn
+      tree.all(:Ip).each { |ip| report(:warn, ip.context) }
+
+      return warn
     end
 
     def run
