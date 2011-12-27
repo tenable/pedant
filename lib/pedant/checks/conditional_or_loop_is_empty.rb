@@ -34,10 +34,11 @@ module Pedant
       # All of the loops have a body attribute, so they can be checked together.
       [:For, :Foreach, :Repeat, :While].each do |cls|
         tree.all(cls).each do |node|
-          next if !node.body.is_a? Nasl::Empty
+          next unless node.body.is_a? Nasl::Empty
 
-          report(:warn, "#{cls} loop in #{file} has an empty statement as its body.")
-          warn
+          fail
+
+          report(:error, "#{cls} loop in #{file} has an empty statement as its body.")
         end
       end
 
@@ -49,10 +50,11 @@ module Pedant
           branch = node.send(name)
 
           next if branch.nil?
-          next if !branch.is_a? Nasl::Empty
+          next unless branch.is_a? Nasl::Empty
 
-          report(:warn, "If statement in #{file} has an empty statement as #{name} branch.")
-          warn
+          fail
+
+          report(:error, "If statement in #{file} has an empty statement as #{name} branch.")
         end
       end
     end
