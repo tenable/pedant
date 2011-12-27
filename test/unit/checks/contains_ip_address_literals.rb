@@ -24,40 +24,22 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-module Pedant
-  class CheckParseTestCode < Check
-    def self.requires
-      super + [:codes, :main, :test_mode]
-    end
+class TestContainsIpAddressLiterals < Test::Unit::TestCase
+  include Pedant::Test
 
-    def self.provides
-      super + [:trees]
-    end
+  def test_none
+    check(
+      :pass,
+      :CheckContainsIpAddressLiterals,
+      %q||
+    )
+  end
 
-    def run
-      def import(path)
-        # Since there are potentially several ways to write the path leading to
-        # a file, we'll use the basename as the key for hashes. This will
-        # prevent parsing the same file multiple times.
-        file = path.basename
-
-        # Mark a placeholder key in the KB for this file. This will prevent us
-        # from trying to parse a library more than once if there is a failure.
-        @kb[:trees][file] = :pending
-
-        tree = Nasl::Parser.new.parse(@kb[:codes][file], path)
-        @kb[:trees][file] = tree
-        report(:info, "Parsed contents of #{path}.")
-      end
-
-      # This check will pass by default.
-      pass
-
-      # Initialize the keys written by this check.
-      @kb[:trees] = {}
-
-      # Load up the main file.
-      import(@kb[:main])
-    end
+  def test_one
+    check(
+      :warn,
+      :CheckContainsIpAddressLiterals,
+      %q|z = 1.2.3.4;|
+    )
   end
 end

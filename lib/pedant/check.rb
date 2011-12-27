@@ -50,7 +50,7 @@ module Pedant
       @kb = kb
 
       # Run all the dependencies for this check if we're in test mode.
-      return unless @kb[:mode] == :test_mode
+      return unless @kb[:test_mode]
       self.class.depends.each do |cls|
         chk = cls.new(@kb)
         chk.run
