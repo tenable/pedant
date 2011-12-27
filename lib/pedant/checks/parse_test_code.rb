@@ -25,24 +25,46 @@
 ################################################################################
 
 module Pedant
-  class CheckContainsNoTabs < Check
+  class CheckParseTestCode < Check
     def self.requires
-      super + [:codes]
+      super + [:codes, :main, :test_mode]
     end
 
-    def check(file, code)
-      return unless code =~ /\t/
-
-      report(:warn, "Tabs were found in #{file}.")
-      warn
+    def self.provides
+      super + [:trees]
     end
 
     def run
+      def import(path)
+        # Since there are potentially several ways to write the path leading to
+        # a file, we'll use the basename as the key for hashes. This will
+        # prevent parsing the same file multiple times.
+        file = path.basename
+
+        # Mark a placeholder key in the KB for this file. This will prevent us
+        # from trying to parse a library more than once if there is a failure.
+        @kb[:trees][file] = :pending
+
+        begin
+          tree = Nasl::Parser.new.parse(@kb[:codes][file], path)
+          @kb[:trees][file] = tree
+          report(:info, "Parsed contents of #{path}.")
+        rescue
+          # XXX-MAK: Incorporate the error from the parser, as it gives full,
+          # coloured context.
+          report(:error, "Failed to parse #{path}.")
+          return fatal
+        end
+      end
+
       # This check will pass by default.
       pass
 
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
+      # Initialize the keys written by this check.
+      @kb[:trees] = {}
+
+      # Load up the main file.
+      import(@kb[:main])
     end
   end
 end

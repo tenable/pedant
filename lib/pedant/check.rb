@@ -43,6 +43,20 @@ module Pedant
       Dir.glob(Pedant.lib + 'pedant/checks/*.rb').each { |f| load(f) }
     end
 
+    def initialize(kb)
+      @report = []
+      @result = :void
+
+      @kb = kb
+
+      # Run all the dependencies for this check if we're in test mode.
+      return unless @kb[:mode] == :test_mode
+      self.class.depends.each do |cls|
+        chk = cls.new(@kb)
+        chk.run
+      end
+    end
+
     def self.all
       (@_all ||= [])
     end
@@ -59,6 +73,20 @@ module Pedant
       return []
     end
 
+    def self.ready?(kb)
+      self.requires.reduce(true) do |stat, req|
+        stat && kb.has_key?(req)
+      end
+    end
+
+    def self.depends
+      keys = self.requires
+
+      Check.all.reject do |cls|
+        (cls.provides & keys).empty?
+      end
+    end
+
     def report(level, text=nil)
       if !text.nil?
         @report << [level, text]
@@ -68,21 +96,14 @@ module Pedant
       # Convert level from symbol to an array index.
       level = @@levels.index(level) if level.is_a?(Symbol)
 
-      # Print out all components or a report at or below the specified level.
-      @report.select { |l, t| @@levels.index(l) <= level }.map { |l, t| t }.join("\n")
-    end
+      # Format all components of a report at or below the specified level.
+      msg = @report.select { |l, t| @@levels.index(l) <= level }.map { |l, t| t }.join("\n")
+      msg << "\n" unless msg.empty?
 
-    def initialize
-      @provides = []
-      @requires = []
-      @report = []
-      @result = :void
-    end
+      # Format the check's result.
+      msg = "[#{@@statuses[@result]}] #{self.name}\n#{msg}"
 
-    def self.ready?(res)
-      self.requires.reduce(true) do |stat, req|
-        stat && res.has_key?(req)
-      end
+      return msg
     end
 
     def name
@@ -109,10 +130,6 @@ module Pedant
 
     def warn
       @result = :warn
-    end
-
-    def result
-      "[#{@@statuses[@result]}] #{self.name}"
     end
   end
 end

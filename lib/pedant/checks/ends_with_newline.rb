@@ -37,12 +37,12 @@ module Pedant
       warn
     end
 
-    def run(kb)
+    def run
       # This check will pass by default.
       pass
 
       # Run this check on the code in every file.
-      kb[:codes].each { |file, code| check(file, code) }
+      @kb[:codes].each { |file, code| check(file, code) }
     end
   end
 end

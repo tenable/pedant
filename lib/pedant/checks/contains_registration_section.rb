@@ -30,14 +30,14 @@ module Pedant
       super + [:main, :trees]
     end
 
-    def run(kb)
+    def run
       # This check only applies to plugins.
-      return skip unless kb[:main].extname == '.nasl'
+      return skip unless @kb[:main].extname == '.nasl'
 
       # This check will pass by default.
       pass
 
-      tree = kb[:trees][kb[:main]]
+      tree = @kb[:trees][@kb[:main]]
 
       # Find the registration If statement.
       reg = []

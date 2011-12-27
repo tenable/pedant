@@ -24,25 +24,36 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
+require 'test/unit'
+
 module Pedant
-  class CheckContainsNoTabs < Check
-    def self.requires
-      super + [:codes]
+  module Test
+    def self.initialize!(args)
+      # Run all tests by default.
+      args = ['unit/*', 'unit/*/*'] if args.empty?
+
+      # Run each test or category of tests specified on the command line.
+      args.each do |test|
+        Dir.glob(Pedant.test + (test + '.rb')).each { |f| load(f) }
+      end
+
+      Check.initialize!
     end
 
-    def check(file, code)
-      return unless code =~ /\t/
+    def check(result, cls, code)
+      # Create a knowledge base.
+      kb = KnowledgeBase.new(:test_mode)
 
-      report(:warn, "Tabs were found in #{file}.")
-      warn
-    end
+      # Put test code into the knowledge base.
+      kb[:codes] = {}
+      kb[:codes][kb[:main]] = code
 
-    def run
-      # This check will pass by default.
-      pass
+      # Create a new instance of the check, which will execute all dependencies.
+      chk = Pedant.const_get(cls).new(kb)
 
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
+      # Run the test and ensure we got the expected result.
+      chk.run
+      assert_equal(result, chk.result)
     end
   end
 end

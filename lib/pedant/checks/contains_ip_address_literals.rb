@@ -37,12 +37,12 @@ module Pedant
       warn
     end
 
-    def run(kb)
+    def run
       # This check will pass by default.
       pass
 
       # Run this check on the tree of every file.
-      kb[:trees].each { |file, tree| check(file, tree) }
+      @kb[:trees].each { |file, tree| check(file, tree) }
     end
   end
 end

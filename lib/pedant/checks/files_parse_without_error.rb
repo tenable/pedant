@@ -27,17 +27,17 @@
 module Pedant
   class CheckFilesParseWithoutErrors < Check
     def self.requires
-      super + [:base, :main]
+      super + [:file_mode, :base, :main]
     end
 
     def provides
       super + [:codes, :trees]
     end
 
-    def run(kb)
-      def import(kb, path)
+    def run
+      def import(path)
         # All files should be relative to the main file's base in practice.
-        path = kb[:base] + path
+        path = @kb[:base] + path
 
         # Since there are potentially several ways to write the path leading to
         # a file, we'll use the basename as the key for hashes. This will
@@ -46,12 +46,12 @@ module Pedant
 
         # Mark a placeholder key in the KB for this file. This will prevent us
         # from trying to parse a library more than once if there is a failure.
-        kb[:codes][file] = :pending
-        kb[:trees][file] = :pending
+        @kb[:codes][file] = :pending
+        @kb[:trees][file] = :pending
 
         begin
           contents = File.open(path, "rb").read
-          kb[:codes][file] = contents
+          @kb[:codes][file] = contents
           report(:info, "Read contents of #{path}.")
         rescue
           report(:error, "Failed to read contents #{path}.")
@@ -60,7 +60,7 @@ module Pedant
 
         begin
           tree = Nasl::Parser.new.parse(contents, path)
-          kb[:trees][file] = tree
+          @kb[:trees][file] = tree
           report(:info, "Parsed contents of #{path}.")
         rescue
           # XXX-MAK: Incorporate the error from the parser, as it gives full,
@@ -74,11 +74,11 @@ module Pedant
       pass
 
       # Initialize the keys written by this check.
-      kb[:codes] = {}
-      kb[:trees] = {}
+      @kb[:codes] = {}
+      @kb[:trees] = {}
 
       # Load up the main file.
-      import(kb, kb[:main])
+      import(@kb[:main])
 
       return
 
@@ -86,15 +86,15 @@ module Pedant
         # Get the list of all Includes, and prune any that have already had the
         # files they reference parsed.
         libs = Nasl::Include.all.map do |inc|
-          (kb[:base] + inc.filename.text).basename
+          (@kb[:base] + inc.filename.text).basename
         end
 
-        libs.delete_if { |lib| lib == kb[:main] || kb[:trees].has_key?(lib) }
+        libs.delete_if { |lib| lib == @kb[:main] || @kb[:trees].has_key?(lib) }
 
         break if libs.empty?
 
         # Try and parse each library, continuing on failures.
-        libs.each { |lib| import(kb, lib) }
+        libs.each { |lib| import(lib) }
       end
     end
   end

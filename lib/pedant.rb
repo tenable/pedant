@@ -41,9 +41,11 @@ module Pedant
     root + 'test'
   end
 
-  autoload :Check,   'pedant/check'
-  autoload :Cli,     'pedant/cli'
-  autoload :Command, 'pedant/command'
+  autoload :Check,         'pedant/check'
+  autoload :Cli,           'pedant/cli'
+  autoload :Command,       'pedant/command'
+  autoload :KnowledgeBase, 'pedant/knowledge_base'
+  autoload :Test,          'pedant/test'
 end
 
 $LOAD_PATH.unshift(Pedant.lib.to_s)

@@ -38,10 +38,7 @@ module Pedant
 
       # Initialize the knowledge base where checks can store information for
       # other checks.
-      kb = {
-        :base => path.dirname,
-        :main => path.basename
-      }
+      kb = KnowledgeBase.new(:file_mode, path)
 
       # Try to run each pending check, until we've run all our checks or
       # deadlocked.
@@ -54,10 +51,10 @@ module Pedant
         # Run all of the checks that are ready.
         ready.each do |cls|
           # Create a new check instance.
-          chk = cls.new
+          chk = cls.new(kb)
           pending.delete(cls)
 
-          chk.run(kb)
+          chk.run
 
           # Fatal errors mean that no further checks should be processed.
           if chk.result == :fatal
@@ -66,16 +63,14 @@ module Pedant
           end
 
           # Display the results of the check.
-          puts chk.result
-          report = chk.report(cfg[:verbose])
-          puts report unless report.empty?
+          puts chk.report(cfg[:verbose])
         end
       end
 
       # Notify the user if any checks did not run due to unsatisfied
       # dependencies or a fatal error occurring before they had the chance to
       # run.
-      pending.each { |cls| puts cls.result }
+      pending.each { |cls| puts cls.new(kb).report(cfg[:verbose]) }
     end
   end
 end

@@ -24,25 +24,49 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-module Pedant
-  class CheckContainsNoTabs < Check
-    def self.requires
-      super + [:codes]
+class TestPluginTypeNotSpecified < Test::Unit::TestCase
+  include Pedant::Test
+
+  def test_none
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q||
+    )
+  end
+
+  def test_one
+    check(
+      :pass,
+      :CheckPluginTypeNotSpecified,
+      %q|script_set_attribute(attribute:"plugin_type", value:"local");|
+    )
+  end
+
+  def test_many
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|script_set_attribute(attribute:"plugin_type", value:"local");| +
+      %q|script_set_attribute(attribute:"plugin_type", value:"remote");|
+    )
+  end
+
+  def test_valid
+    ['combined', 'local', 'remote'].each do |type|
+      check(
+        :pass,
+        :CheckPluginTypeNotSpecified,
+        %Q|script_set_attribute(attribute:"plugin_type", value:"#{type}");|
+      )
     end
+  end
 
-    def check(file, code)
-      return unless code =~ /\t/
-
-      report(:warn, "Tabs were found in #{file}.")
-      warn
-    end
-
-    def run
-      # This check will pass by default.
-      pass
-
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
-    end
+  def test_invalid
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|script_set_attribute(attribute:"plugin_type", value:"foo");|
+    )
   end
 end

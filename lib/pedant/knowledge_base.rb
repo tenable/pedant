@@ -25,24 +25,18 @@
 ################################################################################
 
 module Pedant
-  class CheckContainsNoTabs < Check
-    def self.requires
-      super + [:codes]
-    end
+  class KnowledgeBase < Hash
+    def initialize(mode, path=nil)
+      self[mode] = true
 
-    def check(file, code)
-      return unless code =~ /\t/
-
-      report(:warn, "Tabs were found in #{file}.")
-      warn
-    end
-
-    def run
-      # This check will pass by default.
-      pass
-
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
+      case mode
+      when :file_mode
+        self[:base] = path.dirname
+        self[:main] = path.basename
+      when :test_mode
+        self[:base] = Pathname.new('/var/empty')
+        self[:main] = Pathname.new('test.nasl')
+      end
     end
   end
 end

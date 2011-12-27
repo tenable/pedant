@@ -30,16 +30,13 @@ module Pedant
       super + [:main, :trees]
     end
 
-    def run(kb)
+    def run
       # This check only applies to plugins.
-      return skip unless kb[:main].extname == '.nasl'
-
-      # This check will fail by default.
-      fail
+      return skip unless @kb[:main].extname == '.nasl'
 
       args = []
 
-      tree = kb[:trees][kb[:main]]
+      tree = @kb[:trees][@kb[:main]]
 
       tree.all(:Call).each do |node|
         next unless node.name.name == 'script_set_attribute'
@@ -53,6 +50,12 @@ module Pedant
         # Pull out the value argument.
         arg = node.arg['value']
         next if !arg.is_a? Nasl::String
+
+        # Ensure that the plugin type is valid.
+        unless ['combined', 'local', 'remote'].include? arg.text
+          report(:info, "Plugin is of unknown type #{arg.text}:\n#{arg.context(node)}")
+          return fail
+        end
 
         args << [arg, node]
       end
