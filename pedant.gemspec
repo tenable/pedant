@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest'
 
   s.add_runtime_dependency 'rainbow'
-  s.add_runtime_dependency 'nasl', '>= 0.0.3'
+  s.add_runtime_dependency 'nasl', '>= 0.0.4'
 end
