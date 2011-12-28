@@ -3,14 +3,14 @@ $:.push File.expand_path('../lib', __FILE__)
 require 'pedant/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'pedant'
+  s.name        = 'nasl-pedant'
   s.version     = Pedant::VERSION
   s.authors     = ['Mak Kolybabi']
   s.email       = ['mak@kolybabi.com']
   s.homepage    = 'http://github.com/mogigoma/pedant'
   s.summary     = %q{A static analysis framework for the Nessus Attack Scripting Language.}
 
-  s.rubyforge_project = 'pedant'
+  s.rubyforge_project = 'nasl-pedant'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
