@@ -24,25 +24,20 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-module Pedant
-  class CheckContainsNoLineFeeds < Check
-    def self.requires
-      super + [:codes]
-    end
+class TestContainsNoCarriageReturns < Test::Unit::TestCase
+  include Pedant::Test
 
-    def check(file, code)
-      return unless code =~ /\r/
+  def test_none
+    check(
+      :pass,
+      :CheckContainsNoCarriageReturns,
+      %q||
+    )
 
-      report(:warn, "Line feeds were found in #{file}.")
-      warn
-    end
-
-    def run
-      # This check will pass by default.
-      pass
-
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
-    end
+    check(
+      :warn,
+      :CheckContainsNoCarriageReturns,
+      %Q|\r\n|
+    )
   end
 end
