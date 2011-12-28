@@ -24,26 +24,22 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-module Pedant
-  class CheckEndsWithNewline < Check
-    def self.requires
-      super + [:codes]
-    end
+class TestEndsWithNewline < Test::Unit::TestCase
+  include Pedant::Test
 
-    def check(file, code)
-      return if code[-1] == "\n"
+  def test_does
+    check(
+      :pass,
+      :CheckEndsWithNewline,
+      %Q|\n|
+    )
+  end
 
-      warn
-
-      report(:warn, "#{file} does not end with a newline.")
-    end
-
-    def run
-      # This check will pass by default.
-      pass
-
-      # Run this check on the code in every file.
-      @kb[:codes].each { |file, code| check(file, code) }
-    end
+  def test_does_not
+    check(
+      :warn,
+      :CheckEndsWithNewline,
+      %q||
+    )
   end
 end
