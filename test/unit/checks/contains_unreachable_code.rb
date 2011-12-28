@@ -24,45 +24,70 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-module Pedant
-  class CheckContainsUnreachableCode < Check
-    def self.requires
-      super + [:trees]
-    end
+class TestContainsUnreachableCode < Test::Unit::TestCase
+  include Pedant::Test
 
-    def check(file, tree)
-      def check_statements(file, list)
-        list.each do |node|
-          # Check if the Node is capable of jumping out of the Block, without
-          # resuming where it left off (i.e., Call). The exception is exit(),
-          # which is a builtin Function that terminates execution.
-          if node.is_a?(Nasl::Break) || node.is_a?(Nasl::Continue) || node.is_a?(Nasl::Return) || (node.is_a?(Nasl::Call) && node.name.name == 'exit')
-            # If this is not the final node in the list, then there is
-            # absolutely no way for the later nodes to be accessed.
-            if node != list.last
-              report(:error, "#{file} contains unreachable code.")
-              return fail
-            end
-          end
-        end
-      end
+  def test_top
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      %q||
+    )
 
-      # Unreachable statements occur only when there are sequential lists of
-      # instructions. In layers deeper than the outermost level of indentation,
-      # this only occurs in Blocks.
-      tree.all(:Block).each { |blk| check_statements(file, blk.body) }
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|exit(); foo();|
+    )
 
-      # The main body of a file is not a Block, so it must be considered
-      # separately.
-      check_statements(file, tree)
-    end
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|return; foo();|
+    )
 
-    def run
-      # This check will pass by default.
-      pass
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|break; foo();|
+    )
 
-      # Run this check on the tree from every file.
-      @kb[:trees].each { |file, tree| check(file, tree) }
-    end
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|continue; foo();|
+    )
+  end
+
+  def test_block
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      %q|{}|
+    )
+
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|{ exit(); foo(); }|
+    )
+
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|{ return; foo(); }|
+    )
+
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|{ break; foo(); }|
+    )
+
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      %q|{ continue; foo(); }|
+    )
   end
 end
