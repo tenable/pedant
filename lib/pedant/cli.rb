@@ -66,9 +66,7 @@ module Pedant
     end
 
     def self.usage
-      puts "For the moment, you have to run Pedant from its top-level directory."
-      puts
-      puts "./bin/pedant [flags] [command] [filename ...]"
+      puts "pedant [flags] [command] [filename ...]"
       puts
       puts "Flags:"
       puts "    -v       Display more verbose (warning) messages. "
