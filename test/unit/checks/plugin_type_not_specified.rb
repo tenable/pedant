@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011, Mak Kolybabi
+# Copyright (c) 2011-2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
   end
 
   def test_valid
-    ['combined', 'local', 'remote'].each do |type|
+    ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].each do |type|
       check(
         :pass,
         :CheckPluginTypeNotSpecified,
