@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011-2012, Mak Kolybabi
+# Copyright (c) 2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 ################################################################################
 
 module Pedant
-  class CheckPluginTypeNotSpecified < Check
+  class CheckScriptFamilyNotSpecified < Check
     def self.requires
       super + [:main, :trees]
     end
@@ -39,21 +39,29 @@ module Pedant
       tree = @kb[:trees][@kb[:main]]
 
       tree.all(:Call).each do |node|
-        next unless node.name.name == 'script_set_attribute'
-        next unless node.arg.has_key? 'attribute'
+        next unless node.name.name == 'script_family'
+        next if node.args.empty?
+        next unless node.args.first.expr.is_a? Nasl::String
 
-        # Pull out the attribute argument.
-        arg = node.arg['attribute']
-        next if !arg.is_a? Nasl::String
-        next if arg.text != 'plugin_type'
+        # Pull out argument
+        arg = node.args.first.expr
 
-        # Pull out the value argument.
-        arg = node.arg['value']
-        next if !arg.is_a? Nasl::String
+        # Ensure that the script family is valid.
+        unless ["AIX Local Security Checks", "Backdoors", "Brute force attacks",
+          "CentOS Local Security Checks", "CGI abuses", "CISCO", "Databases",
+          "Debian Local Security Checks", "Default Unix Accounts",
+          "Denial of Service", "DNS", "Fedora Local Security Checks",
+          "Finger abuses", "Firewalls", "FTP", "Gain a shell remotely",
+          "General", "Gentoo Local Security Checks", "HP-UX Local Security Checks",
+          "MacOS X Local Security Checks", "Mandriva Local Security Checks",
+          "Misc.", "Netware", "Peer-To-Peer File Sharing", "Port scanners",
+          "Red Hat Local Security Checks", "RPC", "SCADA", "Service detection",
+          "Settings", "Slackware Local Security Checks", "SMTP problems",
+          "SNMP", "Solaris Local Security Checks", "SuSE Local Security Checks",
+          "Ubuntu Local Security Checks", "VMware ESX Local Security Checks",
+          "Web Servers", "Windows"].include? arg.text
 
-        # Ensure that the plugin type is valid.
-        unless ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].include? arg.text
-          report(:info, "Plugin is of unknown type #{arg.text}:\n#{arg.context(node)}")
+          report(:info, "Plugin belongs to unknown #{arg.text}:\n#{arg.context(node)}")
           return fail
         end
 
@@ -62,15 +70,15 @@ module Pedant
 
       case args.length
       when 0
-        report(:error, "Plugin does not specify a type.")
+        report(:error, "Plugin does not specify a script_family.")
         fail
       when 1
         arg = args.first[0]
         call = args.first[1]
-        report(:info, "Plugin is of type #{arg.text}:\n#{arg.context(call)}")
+        report(:info, "Plugin belongs to script family #{arg.text}:\n#{arg.context(call)}")
         pass
       else
-        report(:error, "Plugin specifies multiple types.")
+        report(:error, "Plugin specifies multiple script family's.")
         args.each { |arg, call| report(:error, arg.context(call)) }
         fail
       end

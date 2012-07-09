@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011-2012, Mak Kolybabi
+# Copyright (c) 2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,13 +24,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-class TestPluginTypeNotSpecified < Test::Unit::TestCase
+class TestScriptFamilyNotSpecified < Test::Unit::TestCase
   include Pedant::Test
 
   def test_none
     check(
       :fail,
-      :CheckPluginTypeNotSpecified,
+      :CheckScriptFamilyNotSpecified,
       %q||
     )
   end
@@ -38,26 +38,40 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
   def test_one
     check(
       :pass,
-      :CheckPluginTypeNotSpecified,
-      %q|script_set_attribute(attribute:"plugin_type", value:"local");|
+      :CheckScriptFamilyNotSpecified,
+      %q|script_family("Windows");|
     )
   end
 
   def test_many
     check(
       :fail,
-      :CheckPluginTypeNotSpecified,
-      %q|script_set_attribute(attribute:"plugin_type", value:"local");| +
-      %q|script_set_attribute(attribute:"plugin_type", value:"remote");|
+      :CheckScriptFamilyNotSpecified,
+      %q|script_family("Windows");| +
+      %q|script_family("FTP");|
     )
   end
 
   def test_valid
-    ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].each do |type|
+    [
+      "AIX Local Security Checks", "Backdoors", "Brute force attacks",
+      "CentOS Local Security Checks", "CGI abuses", "CISCO", "Databases",
+      "Debian Local Security Checks", "Default Unix Accounts",
+      "Denial of Service", "DNS", "Fedora Local Security Checks",
+      "Finger abuses", "Firewalls", "FTP", "Gain a shell remotely",
+      "General", "Gentoo Local Security Checks", "HP-UX Local Security Checks",
+      "MacOS X Local Security Checks", "Mandriva Local Security Checks",
+      "Misc.", "Netware", "Peer-To-Peer File Sharing", "Port scanners",
+      "Red Hat Local Security Checks", "RPC", "SCADA", "Service detection",
+      "Settings", "Slackware Local Security Checks", "SMTP problems",
+      "SNMP", "Solaris Local Security Checks", "SuSE Local Security Checks",
+      "Ubuntu Local Security Checks", "VMware ESX Local Security Checks",
+      "Web Servers", "Windows"
+    ].each do |type|
       check(
         :pass,
-        :CheckPluginTypeNotSpecified,
-        %Q|script_set_attribute(attribute:"plugin_type", value:"#{type}");|
+        :CheckScriptFamilyNotSpecified,
+        %Q|script_family("#{type}");|
       )
     end
   end
@@ -65,8 +79,8 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
   def test_invalid
     check(
       :fail,
-      :CheckPluginTypeNotSpecified,
-      %q|script_set_attribute(attribute:"plugin_type", value:"foo");|
+      :CheckScriptFamilyNotSpecified,
+      %q|script_family("foo bar");|
     )
   end
 end
