@@ -52,7 +52,7 @@ module Pedant
         next if !arg.is_a? Nasl::String
 
         # Ensure that the plugin type is valid.
-        unless ['combined', 'local', 'remote'].include? arg.text
+        unless ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].include? arg.text
           report(:info, "Plugin is of unknown type #{arg.text}:\n#{arg.context(node)}")
           return fail
         end
