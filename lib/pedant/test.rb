@@ -40,6 +40,10 @@ module Pedant
       Check.initialize!
     end
 
+    def setup
+      Check.initialize!
+    end
+
     def check(result, cls, code)
       # Create a knowledge base.
       kb = KnowledgeBase.new(:test_mode)

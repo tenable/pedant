@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.license     = 'BSD'
   s.homepage    = 'http://github.com/tenable/pedant'
   s.summary     = 'A static analysis framework for the Nessus Attack Scripting Language.'
-  s.description = File.open('README.md').read
 
   s.authors     = ['Mak Kolybabi']
   s.email       = ['mak@kolybabi.com']
