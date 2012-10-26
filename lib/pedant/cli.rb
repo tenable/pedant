@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011, Mak Kolybabi
+# Copyright (c) 2011-2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,85 @@ require 'optparse'
 
 module Pedant
   class Cli
+    @@optparse = nil
+
     def self.run
-      cfg = {}
+      options = {
+        input_mode: :filesystem,
+        output_mode: :terminal,
+        verbosity: 0
+      }
 
       Command.initialize!
 
-      optparse = OptionParser.new do |opts|
-        opts.banner = "Usage: pedant [options] [command [args]]"
+      @@optparse = OptionParser.new do |opts|
+        opts.banner = "Usage: pedant [global-options] [command [command-options] [args]]"
 
-        cfg[:verbose] = 0
-        opts.on('-v', '--verbose', 'Output more information') do
-          cfg[:verbose] += 1
+        opts.separator ""
+        opts.separator "Input formats:"
+
+        opts.on('-f', '--filesystem', 'Read input from the filesystem.') do
+          options[:input_mode] = :email
+        end
+
+        opts.on('-g', '--git', 'Read input from a Git repository.') do
+          options[:input_mode] = :email
+        end
+
+        opts.separator ""
+        opts.separator "Output formats:"
+
+        opts.on('-e', '--email', 'Output in a form suitable for an email.') do
+          options[:output_mode] = :email
+        end
+
+        opts.on('-t', '--terminal', 'Output in a form suitable for a terminal.') do
+          options[:output_mode] = :terminal
+        end
+
+        opts.separator ""
+        opts.separator "Global settings:"
+
+        opts.on('-v', '--verbose', 'Output more information, use multiple time to increase verbosity.') do
+          options[:verbosity] += 1
+        end
+
+        opts.separator ""
+        opts.separator "Builtin operations:"
+
+        opts.on('-h', '--help', 'Display this help screen.') do
+          puts opts
+          exit 1
+        end
+
+        opts.on('-l', '--list', 'Display the list of available commands.') do
+          puts Command.list
+          exit 1
+        end
+
+        opts.on('-V', '--version', 'Display the version of Pedant.') do
+          puts "#{Pedant::VERSION}"
+          exit
         end
       end
 
-      optparse.parse!
+      @@optparse.order!
 
-      # Sanity check the command line arguments.
-      if ARGV.empty?
-        puts "No command was specified."
-        puts
-        usage
-        exit 1
-      end
-
+      # Sanity check the command.
+      usage("No command was specified.") if ARGV.empty?
       cmd = ARGV.shift
       cls = Command.find(cmd)
-      if cls.nil? then
-        puts "Command '#{cmd}' not supported."
-        puts
-        usage
-        exit 1
-      end
+      usage("Command '#{cmd}' not supported.") if cls.nil?
 
       # Run the command.
-      cls.run(cfg, ARGV)
+      cls.run(options, ARGV)
     end
 
-    def self.usage
-      puts "pedant [flags] [command] [filename ...]"
+    def self.usage(msg)
+      puts msg.color(:red)
       puts
-      puts "Flags:"
-      puts "    -v       Display more verbose (warning) messages. "
-      puts "    -vv      Display more verbose (informational) messages. "
-      puts
-      puts "Commands:"
-      puts "    check    Runs all included checks against the specified plugin(s)."
-      puts "    test     Runs the specified unit tests, all are selected by default."
+      puts @@optparse
+      exit 1
     end
   end
 end

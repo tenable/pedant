@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011, Mak Kolybabi
+# Copyright (c) 2011-2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ module Pedant
   autoload :Command,       'pedant/command'
   autoload :KnowledgeBase, 'pedant/knowledge_base'
   autoload :Test,          'pedant/test'
+  autoload :VERSION,       'pedant/version'
 end
 
 $LOAD_PATH.unshift(Pedant.lib.to_s)

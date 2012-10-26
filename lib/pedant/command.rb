@@ -38,6 +38,10 @@ module Pedant
       all << cls
     end
 
+    def self.list
+      all.map{ |cls| cls.binding }
+    end
+
     def self.find(cmd)
       all.each do |cls|
         return cls if cls.binding == cmd
