@@ -92,11 +92,11 @@ module Pedant
     end
 
     def report(level, text=nil)
-      if @@levels.index(level).nil?
-        raise "Reporting level #{level} is not known."
-      end
-
       unless text.nil?
+        if @@levels.index(level).nil?
+          raise "Reporting level #{level} is not known."
+        end
+
         @report << [level, text]
         return
       end
