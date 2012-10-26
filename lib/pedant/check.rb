@@ -116,7 +116,7 @@ module Pedant
 
     def self.friendly_name
       # Mangle the class name to be more user-friendly.
-      self.name.gsub(/.*::/, '').gsub(/^Check/, '').gsub(/([A-Z][^A-Z]*)/, ' \1').strip
+      self.name.gsub(/.*::/, '').gsub(/^Check/, '').gsub(/[A-Z][^A-Z]*/, ' \&').strip
     end
 
     def fail
