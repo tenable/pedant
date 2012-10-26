@@ -105,7 +105,7 @@ module Pedant
       msg << "\n" unless msg.empty?
 
       # Format the check's result.
-      msg = "[#{@@statuses[@result]}] #{self.friendly_name}\n#{msg}"
+      msg = "[#{@@statuses[@result]}] #{self.class.friendly_name}\n#{msg}"
 
       return msg
     end
