@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011, Mak Kolybabi
+# Copyright (c) 2011-2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,88 @@ module Pedant
       'check'
     end
 
-    def self.analyze(cfg, path, args)
+    def self.help
+      @@optparse.to_s
+    end
+
+    def self.optparse(options, args)
+      @@optparse = OptionParser.new do |opts|
+        opts.banner = "Usage: pedant [global-options] #{binding} [command-options] [args]"
+
+        opts.separator ""
+        opts.separator "Input formats:"
+
+        opts.on('-f', '--filesystem', 'Read input from the filesystem.') do
+          options[:input_mode] = :filesystem
+        end
+
+        opts.on('-g', '--git', 'Read input from a Git repository.') do
+          options[:input_mode] = :git
+        end
+
+        opts.separator ""
+        opts.separator "Output formats:"
+
+        opts.on('-e', '--email', 'Output in a form suitable for an email.') do
+          options[:output_mode] = :email
+        end
+
+        opts.on('-t', '--terminal', 'Output in a form suitable for a terminal.') do
+          options[:output_mode] = :terminal
+        end
+
+        opts.separator ""
+        opts.separator "Common operations:"
+
+        opts.on('-h', '--help', 'Display this help screen.') do
+          puts opts
+          exit 1
+        end
+
+        opts.on('-l', '--list', 'List the available checks.') do
+          Check.initialize!
+          puts Check.list
+          exit 0
+        end
+      end
+
+      @@optparse.order!(args)
+
+      return options, args
+    end
+
+    def self.run_all(opts, args)
+      # Load all of the checks.
       Check.initialize!
 
+      # Separate plugins and libraries from the rest of the arguments.
+      paths = args.select { |a| a =~ /(\/|\.(inc|nasl))$/ }
+      args -= paths
+
+      # If we have paths that aren't acceptable, there's a problem.
+      usage("One or more unacceptable files were specified.") unless args.empty?
+
+      # If we have no paths to process, there's a problem.
+      usage("No directories (/), libraries (.inc), or plugins (.nasl) were specified.") if paths.empty?
+
+      # Collect all the paths together, recursively.
+      dirents = []
+      paths.each do |path|
+        begin
+          Pathname.new(path).find do |dirent|
+            if dirent.file? && dirent.extname =~ /inc|nasl/
+              dirents << dirent
+            end
+          end
+        rescue SystemCallError => e
+          usage(e.message)
+        end
+      end
+
+      dirents.each { |d| run_one(opts, d) }
+    end
+
+    def self.run_one(opts, path)
       # Get a list of every existing check.
       pending = Check.all
 
@@ -63,14 +142,14 @@ module Pedant
           end
 
           # Display the results of the check.
-          puts chk.report(cfg[:verbose])
+          puts chk.report(opts[:verbosity])
         end
       end
 
       # Notify the user if any checks did not run due to unsatisfied
       # dependencies or a fatal error occurring before they had the chance to
       # run.
-      pending.each { |cls| puts cls.new(kb).report(cfg[:verbose]) }
+      pending.each { |cls| puts cls.new(kb).report(opts[:verbosity]) }
     end
   end
 end

@@ -57,6 +57,10 @@ module Pedant
       end
     end
 
+    def self.list
+      all.map{ |cls| cls.friendly_name }
+    end
+
     def self.all
       (@_all ||= [])
     end
@@ -101,14 +105,14 @@ module Pedant
       msg << "\n" unless msg.empty?
 
       # Format the check's result.
-      msg = "[#{@@statuses[@result]}] #{self.name}\n#{msg}"
+      msg = "[#{@@statuses[@result]}] #{self.friendly_name}\n#{msg}"
 
       return msg
     end
 
-    def name
-      # Mangle the classes name to be more user-friendly.
-      self.class.name.gsub(/.*::/, '').gsub(/^Check/, '').gsub(/([A-Z][^A-Z]*)/, ' \1').strip
+    def self.friendly_name
+      # Mangle the class name to be more user-friendly.
+      self.name.gsub(/.*::/, '').gsub(/^Check/, '').gsub(/([A-Z][^A-Z]*)/, ' \1').strip
     end
 
     def fail

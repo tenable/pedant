@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011, Mak Kolybabi
+# Copyright (c) 2011-2012, Mak Kolybabi
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,29 @@ module Pedant
       'test'
     end
 
-    def self.run(cfg, args)
+    def self.help
+      @@optparse.to_s
+    end
+
+    def self.optparse(options, args)
+      @@optparse = OptionParser.new do |opts|
+        opts.banner = "Usage: pedant [global-options] #{binding} [command-options] [args]"
+
+        opts.separator ""
+        opts.separator "Common operations:"
+
+        opts.on('-h', '--help', 'Display this help screen.') do
+          puts opts
+          exit 1
+        end
+      end
+
+      @@optparse.order!(args)
+
+      return options, args
+    end
+
+    def self.run_all(opts, args)
       Test.initialize!(args)
     end
   end

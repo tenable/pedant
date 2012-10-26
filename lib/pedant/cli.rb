@@ -43,28 +43,6 @@ module Pedant
         opts.banner = "Usage: pedant [global-options] [command [command-options] [args]]"
 
         opts.separator ""
-        opts.separator "Input formats:"
-
-        opts.on('-f', '--filesystem', 'Read input from the filesystem.') do
-          options[:input_mode] = :email
-        end
-
-        opts.on('-g', '--git', 'Read input from a Git repository.') do
-          options[:input_mode] = :email
-        end
-
-        opts.separator ""
-        opts.separator "Output formats:"
-
-        opts.on('-e', '--email', 'Output in a form suitable for an email.') do
-          options[:output_mode] = :email
-        end
-
-        opts.on('-t', '--terminal', 'Output in a form suitable for a terminal.') do
-          options[:output_mode] = :terminal
-        end
-
-        opts.separator ""
         opts.separator "Global settings:"
 
         opts.on('-v', '--verbose', 'Output more information, use multiple time to increase verbosity.') do
@@ -72,7 +50,7 @@ module Pedant
         end
 
         opts.separator ""
-        opts.separator "Builtin operations:"
+        opts.separator "Common operations:"
 
         opts.on('-h', '--help', 'Display this help screen.') do
           puts opts

@@ -65,36 +65,19 @@ module Pedant
       left + middle + right
     end
 
-    def self.run(cfg, args)
-      # Separate plugins and libraries from the rest of the arguments.
-      paths = args.select { |arg| arg =~ /(\/|\.(inc|nasl))$/ }
-      args -= paths
+    def self.run(opts, args)
+      # Parse the command's arguments.
+      opts, args = optparse(opts, args)
 
-      # If we have no paths to process, there's a problem. Special purpose
-      # commands that don't require files to be declared should override this
-      # method.
-      if paths.empty?
-        puts "No directories (/), libraries (.inc), or plugins (.nasl) were specified."
-        exit 1
-      end
+      # Run the command.
+      self.run_all(opts, args)
+    end
 
-      # Collect all the paths together, recursively.
-      dirents = []
-      paths.each do |path|
-        Pathname.new(path).find do |dirent|
-          if dirent.file? && dirent.extname =~ /inc|nasl/
-            dirents << dirent
-          end
-        end
-      end
-
-      # If the command is capable of handling all the paths at once, send them
-      # in a group, otherwise send them individually.
-      if self.respond_to? :analyze_all then
-        analyze_all(cfg, dirents, args)
-      else
-        dirents.each { |d| analyze(cfg, d, args) }
-      end
+    def self.usage(msg)
+      puts msg.color(:red)
+      puts
+      puts help
+      exit 1
     end
   end
 end
