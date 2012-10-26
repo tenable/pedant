@@ -58,7 +58,7 @@ module Pedant
     end
 
     def self.list
-      all.map{ |cls| cls.friendly_name }
+      all.map{ |cls| cls.friendly_name }.sort
     end
 
     def self.all

@@ -39,7 +39,7 @@ module Pedant
     end
 
     def self.list
-      all.map{ |cls| cls.binding }
+      all.map{ |cls| cls.binding }.sort
     end
 
     def self.find(cmd)
