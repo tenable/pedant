@@ -24,6 +24,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
+require 'set'
+
 module Pedant
   class CommandCheck < Command
     def self.binding
@@ -35,6 +37,8 @@ module Pedant
     end
 
     def self.optparse(options, args)
+      options[:checks] = Set.new
+
       @@optparse = OptionParser.new do |opts|
         opts.banner = "Usage: pedant [global-options] #{binding} [command-options] [args]"
 
@@ -63,17 +67,32 @@ module Pedant
         opts.separator ""
         opts.separator "Common operations:"
 
+        opts.on('-c=NAME', '--check=NAME', 'Run only the check named, and its dependencies.') do |name|
+          # Unmangle class name and be very forgiving.
+          name = "Check" + name.gsub(/[-._ ]/, '')
+
+          begin
+            cls = Pedant.const_get(name)
+          rescue NameError => e
+            usage(e.message)
+          end
+
+          options[:checks] << cls
+        end
+
         opts.on('-h', '--help', 'Display this help screen.') do
           puts opts
           exit 1
         end
 
         opts.on('-l', '--list', 'List the available checks.') do
-          Check.initialize!
           puts Check.list
           exit 0
         end
       end
+
+      # Load all of the checks.
+      Check.initialize!
 
       @@optparse.order!(args)
 
@@ -81,9 +100,6 @@ module Pedant
     end
 
     def self.run_all(opts, args)
-      # Load all of the checks.
-      Check.initialize!
-
       # Separate plugins and libraries from the rest of the arguments.
       paths = args.select { |a| a =~ /(\/|\.(inc|nasl))$/ }
       args -= paths
@@ -112,8 +128,12 @@ module Pedant
     end
 
     def self.run_one(opts, path)
-      # Get a list of every existing check.
-      pending = Check.all
+      # Get a list of the checks we're going to be running.
+      if not opts[:checks].empty?
+        pending = opts[:checks].to_a
+      else
+        pending = Check.all
+      end
 
       # Initialize the knowledge base where checks can store information for
       # other checks.
