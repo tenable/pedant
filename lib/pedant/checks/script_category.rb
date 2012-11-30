@@ -69,8 +69,8 @@ module Pedant
       unless sc_node.args.first.expr.is_a? Nasl::Lvalue
         report(
           :error,
-          "script_category() was called with the wrong type of argument\n" +
-          "(a variable starting with ACT_ must be provided):\n" +
+          "script_category() was called with the wrong type of argument.\n" +
+          "A variable (not a string literal) starting with ACT_ must be provided:\n" +
           arg.context(sc_node)
         )
         return fail
