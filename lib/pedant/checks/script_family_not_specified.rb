@@ -97,7 +97,7 @@ module Pedant
           "Windows : User management"
         ].include? arg.text
 
-          report(:info, "Plugin belongs to unknown #{arg.text}:\n#{arg.context(node)}")
+          report(:info, "Plugin belongs to unknown family #{arg.text}:\n#{arg.context(node)}")
           return fail
         end
 
@@ -114,7 +114,7 @@ module Pedant
         report(:info, "Plugin belongs to script family #{arg.text}:\n#{arg.context(call)}")
         pass
       else
-        report(:error, "Plugin specifies multiple script family's.")
+        report(:error, "Plugin specifies multiple script families.")
         args.each { |arg, call| report(:error, arg.context(call)) }
         fail
       end
