@@ -126,16 +126,6 @@ module Pedant
         return fail
       end
 
-      # Ensure that the script id is valid.
-      if arg.text.slice(-1) == " "
-        report(
-          :error,
-          "Script name has trailing whitespace:\n" +
-          arg.context(sn_node)
-        )
-        return fail
-      end
-
       report(:info, "Plugin has a script name of '#{arg.text}':\n#{arg.context(sn_node)}")
       pass
     end
