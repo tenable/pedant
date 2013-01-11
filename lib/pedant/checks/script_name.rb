@@ -91,8 +91,7 @@ module Pedant
       unless arg.is_a? Nasl::String
         report(
           :error,
-          "script_name() was called with the wrong type of argument.\n" +
-          "An integer literal between 10001 and 999999 inclusive is required:\n" +
+          "script_name() was called with the wrong type of argument. A string is required.\n" +
           arg.context(sn_node)
         )
         return fail
