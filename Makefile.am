@@ -1,6 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
-CFLAGS=-Wall -DPROG="\"$(PACKAGE)\"" -DVERSION=\"$(VERSION)\"
-LDFLAGS=
+
+AM_CFLAGS = -DPKGDATADIR='"$(pkgdatadir)"'
 
 bin_PROGRAMS = pedant
 pedant_SOURCES = engine/pedant.c
+dist_pkgdata_DATA = checks/boot.lua

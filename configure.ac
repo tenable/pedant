@@ -10,8 +10,14 @@ AC_CONFIG_SRCDIR([engine/pedant.c])
 AC_PROG_CC
 
 # Checks for libraries.
+AC_CHECK_LIB([lua], [lua_version], [],[
+  echo "Lua library is required for this program."
+  exit -1])
 
 # Checks for header files.
+AC_CHECK_HEADERS([lua.h])
+AC_CHECK_HEADERS([lualib.h])
+AC_CHECK_HEADERS([lauxlib.h])
 AC_CHECK_HEADERS([stdlib.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
