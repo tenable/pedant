@@ -2,3 +2,26 @@
 \#*\#
 *~
 *.swp
+
+# Debugging files.
+/core
+
+# Derived files.
+/.deps
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache
+/autoscan-2.69.log
+/confdefs.h
+/config.log
+/config.status
+/configure
+/depcomp
+/pedant-*.tar.gz
+/install-sh
+/missing
+*.o
+
+# Binary files.
+/pedant
