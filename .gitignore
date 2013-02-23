@@ -8,20 +8,10 @@
 
 # Derived files.
 /.deps
-/Makefile
-/Makefile.in
-/aclocal.m4
-/autom4te.cache
-/autoscan-2.69.log
-/confdefs.h
-/config.log
-/config.status
-/configure
-/depcomp
-/pedant-*.tar.gz
-/install-sh
-/missing
+*.a
 *.o
 
 # Binary files.
+/lib/lua/src/lua
+/lib/lua/src/luac
 /pedant

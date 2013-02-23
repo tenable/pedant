@@ -1,3 +1,4 @@
+#include <err.h>
 #include <stdlib.h>
 
 #include <lua.h>
@@ -15,7 +16,7 @@ int main(int argc, const char **argv, const char **envp)
 
 	luaL_openlibs(L);
 
-	rc = luaL_loadfile(L, PKGDATADIR "/boot.lua");
+	rc = luaL_loadfile(L, CHECK_DIR "/boot.lua");
 	if (rc != LUA_OK)
 		err(EXIT_FAILURE, "luaL_loadfile");
 
