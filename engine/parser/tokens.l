@@ -6,19 +6,29 @@
 
 #define YY_NO_UNPUT
 
-int convert(int base);
+void read_comment();
+int read_data();
+int read_ident();
+int read_int(int base);
+int read_string();
 %}
 
 %option noyywrap
 
 ident			[_[:alpha:]][_[:alnum:]]*
+
 decdigits		[[:digit:]]+
+octdigits		[0-7]+
 hexdigits		[[:xdigit:]]+
+
+data			(\\.|[^'\\])*
+string			[^\"]*
+
 whitespace		[[:space:]]+
 
 %%
 
-"#"			{ /*comment();*/ return BREAK; }
+"#"			{ read_comment(); }
 
 "break"			{ return BREAK; }
 "continue"		{ return CONTINUE; }
@@ -101,17 +111,20 @@ whitespace		[[:space:]]+
 "{"			{ return LBRACE; }
 "}"			{ return RBRACE; }
 
-{ident}			{ yylval.str = strdup(yytext); return IDENT; }
+{ident}			{ return read_ident(); }
 
-0[xX]{hexdigits}	{ return convert(16); }
-0{decdigits}		{ return convert(8); }
-{decdigits}		{ return convert(10); }
+0[xX]{hexdigits}	{ return read_int(16); }
+0{octdigits}		{ return read_int(8); }
+{decdigits}		{ return read_int(10); }
+
+'{data}'		{ return read_data(); }
+\"{string}\"		{ return read_string(); }
 
 {whitespace}		/* Ignored. */
 
 %%
 
-void comment()
+void read_comment()
 {
 	char ch;
 
@@ -121,9 +134,30 @@ void comment()
 	} while (ch != '\n' && ch != 0);
 }
 
-int convert(int base)
+int read_data()
 {
-	yylval.num = 42;
+	yylval.str = strdup(yytext);
+
+	return DATA;
+}
+
+int read_ident()
+{
+	yylval.str = strdup(yytext);
+
+	return IDENT;
+}
+
+int read_int(int base)
+{
+	yylval.num = (int32_t) strtol(yytext, NULL, base);
 
 	return INTEGER;
+}
+
+int read_string()
+{
+	yylval.str = strdup(yytext);
+
+	return STRING;
 }

@@ -39,10 +39,10 @@ extern int yylex(void);
 
 %token PERIOD COMMA COLON SEMICOLON LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
 
-%token IDENT INTEGER
+%token IDENT INTEGER DATA STRING
 
 %type	<num> INTEGER
-%type	<str> IDENT
+%type	<str> IDENT DATA STRING
 
 %start root
 
@@ -55,6 +55,14 @@ root	: /* empty */
 assign	: IDENT ASS_EQ INTEGER SEMICOLON
 	{
 	  printf("%s = %d;\n", $1, $3);
+	}
+	| IDENT ASS_EQ DATA SEMICOLON
+	{
+	  printf("%s = %s;\n", $1, $3);
+	}
+	| IDENT ASS_EQ STRING SEMICOLON
+	{
+	  printf("%s = %s;\n", $1, $3);
 	}
 
 %%
