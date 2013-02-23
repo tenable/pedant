@@ -18,19 +18,24 @@ MAKE=make -e
 
 CFLAGS+=-D CHECK_DIR='"$(prefix)/share/checks"'
 
-all: pedant lua
+all: engine lua
 
-install: lua-install
-	$(INSTALL) -m 0755 pedant $(prefix)/bin
+install: engine-install lua-install
 
-clean: lua-clean
+clean: engine-clean lua-clean
 
 ################################################################################
 # Engine
 ################################################################################
 
-pedant: engine/pedant.o lib/lua/src/liblua.a
-	$(CC) $(LDFLAGS) -o $@ $^
+engine: engine/pedant.o lib/lua/src/liblua.a
+	$(CC) $(LDFLAGS) -o pedant $^
+
+engine-install:
+	$(INSTALL) -m 0755 pedant $(prefix)/bin
+
+engine-clean:
+	rm -f engine/*.o
 
 ################################################################################
 # Lua
