@@ -2,7 +2,7 @@
 # Settings
 ################################################################################
 
-# These are things you'll likely want to adjust.
+# These are things you may want to adjust.
 prefix=/usr/local/pedant
 
 # These are things you can hopefully leave alone.
@@ -18,9 +18,9 @@ MAKE=make -e
 
 CFLAGS+=-D CHECK_DIR='"$(prefix)/share/checks"'
 
-all: engine lua
+all: lua engine
 
-install: engine-install lua-install
+install: engine-install lua-install check-install
 
 clean: engine-clean lua-clean
 
@@ -54,6 +54,14 @@ lua-install:
 
 lua-clean:
 	$(MAKE) -C $(lua_dir) clean
+
+################################################################################
+# Scripts
+################################################################################
+
+check-install:
+	$(INSTALL) -m 0755 -d $(prefix)/share/checks
+	$(INSTALL) -m 0644 checks/* $(prefix)/share/checks
 
 ################################################################################
 # Patterns
