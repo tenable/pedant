@@ -5,10 +5,17 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+extern FILE *yyin;
+extern char *yytext;
+extern int yyparse(void);
+
 int main(int argc, const char **argv, const char **envp)
 {
 	lua_State *L;
 	int rc;
+
+	yyin = stdin;
+	yyparse();
 
 	L = luaL_newstate();
 	if (L == NULL)

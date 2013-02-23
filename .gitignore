@@ -10,6 +10,8 @@
 /.deps
 *.a
 *.o
+lex.yy.c
+y.tab.[ch]
 
 # Binary files.
 /lib/lua/src/lua

@@ -7,7 +7,7 @@ prefix=/usr/local/pedant
 
 # These are things you can hopefully leave alone.
 CC=clang
-CFLAGS=-Wall -I lib/lua/src
+CFLAGS=-Wall -std=c99 -I lib/lua/src
 INSTALL=install -p
 LDFLAGS=-lm
 MAKE=make -e
@@ -28,7 +28,7 @@ clean: engine-clean lua-clean
 # Engine
 ################################################################################
 
-engine: engine/pedant.o lib/lua/src/liblua.a
+engine: engine/pedant.o engine/parser/y.tab.o engine/parser/lex.yy.o lib/lua/src/liblua.a
 	$(CC) $(LDFLAGS) -o pedant $^
 
 engine-install:
@@ -36,6 +36,17 @@ engine-install:
 
 engine-clean:
 	rm -f engine/*.o
+	rm -f engine/parser/lex.yy.*
+	rm -f engine/parser/y.tab.*
+
+engine/parser/y.tab.o: engine/parser/grammar.y
+	yacc -d -o engine/parser/y.tab.c $^
+	$(CC) $(CFLAGS) -c -o $@ engine/parser/y.tab.c
+
+engine/parser/lex.yy.o: engine/parser/tokens.l engine/parser/y.tab.h
+	# Note: -o cannot have a space before the path.
+	flex -oengine/parser/lex.yy.c $<
+	$(CC) $(CFLAGS) -c -o $@ engine/parser/lex.yy.c
 
 ################################################################################
 # Lua
