@@ -20,7 +20,7 @@ CFLAGS+=-D CHECK_DIR='"$(prefix)/share/checks"'
 
 all: lua engine
 
-install: engine-install lua-install check-install
+install: engine-install lua-install check-install test-install
 
 clean: engine-clean lua-clean
 
@@ -62,6 +62,10 @@ lua-clean:
 check-install:
 	$(INSTALL) -m 0755 -d $(prefix)/share/checks
 	$(INSTALL) -m 0644 checks/* $(prefix)/share/checks
+
+test-install:
+	$(INSTALL) -m 0755 -d $(prefix)/share/tests
+	$(INSTALL) -m 0644 tests/* $(prefix)/share/tests
 
 ################################################################################
 # Patterns
