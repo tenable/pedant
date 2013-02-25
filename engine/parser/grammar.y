@@ -2,12 +2,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "token.h"
+
 extern int yylex(void);
 %}
 
 %union {
-	uint32_t	 num;
-	char		*str;
+	tok_t	*tok;
 }
 
 %token BREAK CONTINUE ELSE EXPORT FOR FOREACH FUNCTION GLOBAL IF IMPORT INCLUDE
@@ -41,9 +42,6 @@ extern int yylex(void);
 
 %token IDENT INTEGER DATA STRING
 
-%type	<num> INTEGER
-%type	<str> IDENT DATA STRING
-
 %start root
 
 %%
@@ -54,15 +52,15 @@ root	: /* empty */
 
 assign	: IDENT ASS_EQ INTEGER SEMICOLON
 	{
-	  printf("%s = %d;\n", $1, $3);
+	  printf("ZZZ\n");
 	}
 	| IDENT ASS_EQ DATA SEMICOLON
 	{
-	  printf("%s = %s;\n", $1, $3);
+	  printf("ZZZ\n");
 	}
 	| IDENT ASS_EQ STRING SEMICOLON
 	{
-	  printf("%s = %s;\n", $1, $3);
+	  printf("ZZZ\n");
 	}
 
 %%

@@ -2,16 +2,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "token.h"
 #include "y.tab.h"
 
 #define YY_NO_UNPUT
 
+static pos_t position = 0;
+
 int make_token(int type);
 void read_comment();
-int read_data();
-int read_ident();
-int read_int(int base);
-int read_string();
 %}
 
 %option noyywrap
@@ -112,14 +111,14 @@ whitespace		[[:space:]]+
 "{"			return make_token(LBRACE);
 "}"			return make_token(RBRACE);
 
-{ident}			return read_ident();
+{ident}			return make_token(IDENT);
 
-0[xX]{hexdigits}	return read_int(16);
-0{octdigits}		return read_int(8);
-{decdigits}		return read_int(10);
+0[xX]{hexdigits}	return make_token(INTEGER);
+0{octdigits}		return make_token(INTEGER);
+{decdigits}		return make_token(INTEGER);
 
-'{data}'		return read_data();
-\"{string}\"		return read_string();
+'{data}'		return make_token(DATA);
+\"{string}\"		return make_token(STRING);
 
 {whitespace}		/* Ignored. */
 
@@ -127,6 +126,12 @@ whitespace		[[:space:]]+
 
 int make_token(int type)
 {
+	pos_t len;
+
+	len = strlen(yytext);
+	yylval.tok = token_new("fake.nasl", position, position + len);
+	position += len;
+
 	return type;
 }
 
@@ -138,32 +143,4 @@ void read_comment()
 	do {
 		ch = input();
 	} while (ch != '\n' && ch != 0);
-}
-
-int read_data()
-{
-	yylval.str = strdup(yytext);
-
-	return make_token(DATA);
-}
-
-int read_ident()
-{
-	yylval.str = strdup(yytext);
-
-	return make_token(IDENT);
-}
-
-int read_int(int base)
-{
-	yylval.num = (int32_t) strtol(yytext, NULL, base);
-
-	return make_token(INTEGER);
-}
-
-int read_string()
-{
-	yylval.str = strdup(yytext);
-
-	return make_token(STRING);
 }

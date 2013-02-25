@@ -28,7 +28,7 @@ clean: engine-clean lua-clean
 # Engine
 ################################################################################
 
-engine: engine/pedant.o engine/parser/y.tab.o engine/parser/lex.yy.o lib/lua/src/liblua.a
+engine: engine/pedant.o engine/parser/token.o engine/parser/y.tab.o engine/parser/lex.yy.o lib/lua/src/liblua.a
 	$(CC) $(LDFLAGS) -o pedant $^
 
 engine-install:
