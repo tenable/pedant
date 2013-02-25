@@ -39,6 +39,23 @@ extern int yylex(void);
 /* Literals */
 %token IDENT INTEGER DATA STRING
 
+/* Precedence */
+%right ASS_EQ ADD_EQ SUB_EQ MUL_EQ DIV_EQ MOD_EQ SLL_EQ SRA_EQ SRL_EQ
+%left OR
+%left AND
+%nonassoc CMP_LT CMP_GT CMP_EQ CMP_NE CMP_GE CMP_LE SUBSTR_EQ SUBSTR_NE REGEX_EQ REGEX_NE
+%left BIT_OR
+%left BIT_XOR
+%left BIT_AND
+%nonassoc BIT_SRA BIT_SRL BIT_SLL
+%left ADD SUB
+%left MUL DIV MOD
+%nonassoc NOT
+%nonassoc UMINUS BIT_NOT
+%right EXP
+%nonassoc INCR DECR
+%nonassoc ARROW
+
 %%
 
 /******************************************************************************
@@ -342,7 +359,7 @@ expr		: LPAREN expr RPAREN
 		| expr SUB expr
 		{
 		}
-		| SUB expr =UMINUS
+		| SUB expr %prec UMINUS
 		{
 		}
 		| BIT_NOT expr
