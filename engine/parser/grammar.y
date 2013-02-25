@@ -11,38 +11,34 @@ extern int yylex(void);
 	tok_t	*tok;
 }
 
+/* Settings */
+%start start
+%pure_parser
+%expect 1
+
+/* Keywords */
 %token BREAK CONTINUE ELSE EXPORT FOR FOREACH FUNCTION GLOBAL IF IMPORT INCLUDE
 %token LOCAL REPEAT RETURN UNTIL REP WHILE
 
+/* Constants */
 %token FALSE UNDEF TRUE
 
+/* Operators */
 %token SUBSTR_EQ SUBSTR_NE
-
 %token REGEX_EQ REGEX_NE
-
 %token CMP_EQ CMP_NE CMP_LE CMP_GE
-
 %token ASS_EQ ADD_EQ SUB_EQ MUL_EQ DIV_EQ MOD_EQ SRL_EQ SRA_EQ SLL_EQ
-
 %token OR AND NOT
-
 %token BIT_OR BIT_XOR BIT_AND BIT_SRA BIT_SRL BIT_SLL
-
 %token CMP_LT CMP_GT
-
 %token INCR DECR
-
 %token EXP
-
 %token ADD SUB MUL DIV MOD
-
 %token BIT_NOT
-
 %token PERIOD COMMA COLON SEMICOLON LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
 
+/* Literals */
 %token IDENT INTEGER DATA STRING
-
-%start root
 
 %%
 
