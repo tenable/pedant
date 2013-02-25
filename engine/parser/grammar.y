@@ -13,7 +13,6 @@ extern int yylex(void);
 
 /* Settings */
 %start start
-%pure_parser
 %expect 1
 
 /* Keywords */
