@@ -127,7 +127,7 @@ whitespace		[[:space:]]+
 int make_token(int type)
 {
 	pos_t len = strlen(yytext);
-	yylval.tok = token_new("fake.nasl", position, position + len);
+	yylval.tok = token_new("fake.nasl", position, position + len - 1);
 	position += len;
 
 	return type;
