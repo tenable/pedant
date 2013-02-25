@@ -547,13 +547,7 @@ ident		: IDENT
 		}
 		;
 
-int		: INT_DEC
-		{
-		}
-		| INT_HEX
-		{
-		}
-		| INT_OCT
+int		: INTEGER
 		{
 		}
 		| FALSE
