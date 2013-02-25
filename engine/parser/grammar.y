@@ -63,13 +63,7 @@ roots		: root roots
 		}
 		;
 
-root		: COMMENT export
-		{
-		}
-		| export
-		{
-		}
-		| COMMENT function
+root		: export
 		{
 		}
 		| function
@@ -121,9 +115,6 @@ simple		: assign
 		{
 		}
 		| empty
-		{
-		}
-		| COMMENT global
 		{
 		}
 		| global
