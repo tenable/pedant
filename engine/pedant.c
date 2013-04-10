@@ -5,11 +5,14 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include "parser/token.h"
+#include "parser/y.tab.h"
+
 extern FILE *yyin;
-extern char *yytext;
+extern int yylex(void);
 extern int yyparse(void);
 
-int main(int argc, const char **argv, const char **envp)
+void luacrap(void)
 {
 	lua_State *L;
 	int rc;
@@ -32,6 +35,26 @@ int main(int argc, const char **argv, const char **envp)
 		err(EXIT_FAILURE, "lua_pcall");
 
 	lua_close(L);
+}
+
+void tokenize(const char *path)
+{
+	yyin = fopen(path, "r");
+	if (yyin == NULL)
+	{
+		warn("Failed to open '%s'", path);
+		return;
+	}
+
+	printf("[%d] %s\n", yylex(), yylval.tok->source);
+
+	fclose(yyin);
+}
+
+int main(int argc, const char **argv, const char **envp)
+{
+	for (int i = 1; i < argc; i++)
+		tokenize(argv[i]);
 
 	return EXIT_SUCCESS;
 }
