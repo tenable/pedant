@@ -14,6 +14,7 @@ void read_comment();
 %}
 
 %option noyywrap
+%option nounput
 
 ident			[_[:alpha:]][_[:alnum:]]*
 
