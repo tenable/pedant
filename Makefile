@@ -7,9 +7,9 @@ prefix=/usr/local/pedant
 
 # These are things you can hopefully leave alone.
 CC=clang
-CFLAGS=-Wall -std=c99 -I lib/lua/src
+CFLAGS=-Wall -std=c99
 INSTALL=install -p
-LDFLAGS=-lm
+LDFLAGS=
 MAKE=make -e
 
 ################################################################################
@@ -18,53 +18,67 @@ MAKE=make -e
 
 CFLAGS+=-D CHECK_DIR='"$(prefix)/share/checks"'
 
-all: lua engine
+all: engine
 
-install: engine-install lua-install check-install test-install
+install: engine-install check-install test-install
 
-clean: engine-clean lua-clean
+clean: engine-clean
 
 ################################################################################
 # Engine
 ################################################################################
 
-engine: engine/pedant.o engine/parser/token.o engine/parser/y.tab.o engine/parser/lex.yy.o lib/lua/src/liblua.a
-	$(CC) $(LDFLAGS) -o pedant $^
+.PHONY: engine
+engine: engine/pedant.o tokenizer
+	@echo [LD] pedant
+	@$(CC) $(LDFLAGS) -o pedant engine/*.o engine/tokenizer/*.o
 
+.PHONY: engine-install
 engine-install:
 	$(INSTALL) -m 0755 pedant $(prefix)/bin
 
+.PHONY: engine-clean
 engine-clean:
-	rm -f engine/*.o
-	rm -f engine/parser/lex.yy.*
-	rm -f engine/parser/y.tab.*
+	@echo [RM] engine/*.o
+	@rm -f engine/*.o
+
+	@echo [RM] engine/*/*.o
+	@rm -f engine/*/*.o
+
+	@echo [RM] engine/tokenizer/tokenizer.c
+	@rm -f engine/tokenizer/tokenizer.c
+
+	@echo [RM] engine/parser/y.tab.*
+	@rm -f engine/parser/y.tab.*
+
+################################################################################
+# Engine :: Command Line Interface
+################################################################################
+
+
+
+################################################################################
+# Engine :: Parser
+################################################################################
 
 engine/parser/y.tab.o: engine/parser/grammar.y
-	yacc -d -o engine/parser/y.tab.c $^
-	$(CC) $(CFLAGS) -c -o $@ engine/parser/y.tab.c
-
-engine/parser/lex.yy.o: engine/parser/tokens.l engine/parser/y.tab.h
-	# Note: -o cannot have a space before the path.
-	flex -oengine/parser/lex.yy.c $<
-	$(CC) $(CFLAGS) -c -o $@ engine/parser/lex.yy.c
+	@echo [YY] $^
+	@bison -d -o engine/parser/y.tab.c $^
+	@echo [CC] $@
+	@$(CC) $(CFLAGS) -c -o $@ engine/parser/y.tab.c
 
 ################################################################################
-# Lua
+# Engine :: Tokenizer
 ################################################################################
 
-lua_dir=lib/lua
+tokenizer: engine/tokenizer/token.o engine/tokenizer/tokenizer.o engine/tokenizer/token_types.o
 
-export INSTALL_TOP=$(prefix)
-export PLAT=posix
-
-lua:
-	$(MAKE) -C $(lua_dir) all
-
-lua-install:
-	$(MAKE) -C $(lua_dir) install
-
-lua-clean:
-	$(MAKE) -C $(lua_dir) clean
+engine/tokenizer/tokenizer.o: engine/tokenizer/tokenizer.l
+	@# Note: -o cannot have a space before the path.
+	@echo [LL] $<
+	@flex -oengine/tokenizer/tokenizer.c $<
+	@echo [CC] $@
+	@$(CC) $(CFLAGS) -c -o $@ engine/tokenizer/tokenizer.c
 
 ################################################################################
 # Scripts
@@ -83,4 +97,5 @@ test-install:
 ################################################################################
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+	@echo [CC] $@
+	@$(CC) $(CFLAGS) -c -o $@ $^

@@ -39,6 +39,9 @@ extern int yylex(void);
 /* Literals */
 %token IDENT INTEGER DATA STRING
 
+/* Miscellania */
+%token COMMENT
+
 /* Precedence */
 %right ASS_EQ ADD_EQ SUB_EQ MUL_EQ DIV_EQ MOD_EQ SLL_EQ SRA_EQ SRL_EQ
 %left OR

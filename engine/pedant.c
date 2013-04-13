@@ -1,54 +1,27 @@
 #include <err.h>
 #include <stdlib.h>
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
-#include "parser/token.h"
-#include "parser/y.tab.h"
-
-extern FILE *yyin;
-extern int yylex(void);
-extern int yyparse(void);
-
-void luacrap(void)
-{
-	lua_State *L;
-	int rc;
-
-	yyin = stdin;
-	yyparse();
-
-	L = luaL_newstate();
-	if (L == NULL)
-		err(EXIT_FAILURE, "luaL_newstate");
-
-	luaL_openlibs(L);
-
-	rc = luaL_loadfile(L, CHECK_DIR "/boot.lua");
-	if (rc != LUA_OK)
-		err(EXIT_FAILURE, "luaL_loadfile");
-
-	rc = lua_pcall(L, 0, 0, 0);
-	if (rc != LUA_OK)
-		err(EXIT_FAILURE, "lua_pcall");
-
-	lua_close(L);
-}
+#include "tokenizer/tokenizer.h"
 
 void tokenize(const char *path)
 {
-	yyin = fopen(path, "r");
-	if (yyin == NULL)
+	tokenizer_comments(true);
+
+	FILE *f = fopen(path, "r");
+	if (f == NULL)
+		err(EXIT_FAILURE, "Failed to open '%s'", path);
+
+	tokenizer_load(fopen(path, "r"));
+
+	tok_t *tok;
+	char buf[32];
+	while ((tok = tokenizer_get_one()) != NULL)
 	{
-		warn("Failed to open '%s'", path);
-		return;
+		token_dump(tok, buf, sizeof(buf));
+		printf("[%p] %s\n", tok, buf);
 	}
 
-	printf("[%d] %s\n", yylex(), yylval.tok->source);
-
-	fclose(yyin);
+	tokenizer_unload();
 }
 
 int main(int argc, const char **argv, const char **envp)

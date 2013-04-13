@@ -1,20 +1,22 @@
 %{
-#include <stdint.h>
+#include <assert.h>
 #include <string.h>
 
-#include "token.h"
-#include "y.tab.h"
+#include "tokenizer.h"
 
-#define YY_NO_UNPUT
+static int make_token(tok_id_t);
 
-static pos_t position = 0;
+static fpos_t position = 0;
+static bool emit_comments = false;
+static tok_t *yylval = NULL;
 
-int make_token(int type);
-void read_comment();
+extern FILE *yyin;
+extern int yylex(void);
 %}
 
 %option noyywrap
 %option nounput
+%option noinput
 
 ident			[_[:alpha:]][_[:alnum:]]*
 
@@ -25,11 +27,10 @@ hexdigits		[[:xdigit:]]+
 data			(\\.|[^'\\])*
 string			[^\"]*
 
+comment			#[^\r\n]*
 whitespace		[[:space:]]+
 
 %%
-
-"#"			read_comment();
 
 "break"			return make_token(BREAK);
 "continue"		return make_token(CONTINUE);
@@ -111,6 +112,7 @@ whitespace		[[:space:]]+
 "]"			return make_token(RBRACK);
 "{"			return make_token(LBRACE);
 "}"			return make_token(RBRACE);
+"@"			return make_token(ATSIGN);
 
 {ident}			return make_token(IDENT);
 
@@ -121,25 +123,75 @@ whitespace		[[:space:]]+
 '{data}'		return make_token(DATA);
 \"{string}\"		return make_token(STRING);
 
+{comment}		if (emit_comments) return make_token(COMMENT);
+
 {whitespace}		/* Ignored. */
 
 %%
 
-int make_token(int type)
+/******************************************************************************
+ * Private Functions
+ ******************************************************************************/
+
+static int make_token(tok_id_t type)
 {
-	pos_t len = strlen(yytext);
-	yylval.tok = token_new("fake.nasl", position, position + len - 1);
+	// Ensure that someone has consumed the previous token.
+	assert(yylval == NULL);
+
+	// Produce a new token.
+	size_t len = strlen(yytext);
+	yylval = token_new(type, position, len);
 	position += len;
 
 	return type;
 }
 
-void read_comment()
+static tok_t *read_token(void)
 {
-	char ch;
+	// Ensure that nobody has consumed the previous token.
+	assert(yylval != NULL);
 
-	/* Consume input until EOL or EOF. */
-	do {
-		ch = input();
-	} while (ch != '\n' && ch != 0);
+	// Consume the token.
+	tok_t *tok = yylval;
+	yylval = NULL;
+
+	return tok;
+}
+
+/******************************************************************************
+ * Public Functions
+ ******************************************************************************/
+
+void tokenizer_comments(bool choice)
+{
+	emit_comments = choice;
+}
+
+tok_t *tokenizer_get_one(void)
+{
+	tok_id_t id = yylex();
+	if (id <= 0)
+		return NULL;
+
+	return read_token();
+}
+
+tok_t *tokenizer_get_all(void)
+{
+	// XXX-MAK: Fill in later.
+	return NULL;
+}
+
+void tokenizer_load(FILE *src)
+{
+	assert(src != NULL);
+
+	yyin = src;
+}
+
+void tokenizer_unload(void)
+{
+	assert(yyin != NULL);
+
+	yyin = NULL;
 }

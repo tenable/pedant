@@ -4,14 +4,14 @@
 *.swp
 
 # Debugging files.
-/core
+*.core
 
 # Derived files.
 /.deps
 *.a
 *.o
-lex.yy.c
-y.tab.[ch]
+parser.c
+tokenizer.c
 
 # Binary files.
 /lib/lua/src/lua
