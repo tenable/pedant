@@ -1,0 +1,12 @@
+*~
+*.o
+
+/Makefile
+/autom4te.cache
+/autoscan-*.log
+/config.log
+/config.status
+/configure
+/configure.scan
+
+/src/pedant
