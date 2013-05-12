@@ -186,7 +186,8 @@ int main(gint argc, gchar **argv)
 		return 1;
 	}
 
-	query("CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP, level INTEGER, message TEXT);");
+	query("CREATE TABLE IF NOT EXISTS log (occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP, level INTEGER, message TEXT);");
+	query("DELETE FROM log;");
 
 	g_debug("Setting logging to highest level for database.");
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, log_to_db, NULL);
