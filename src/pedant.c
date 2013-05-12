@@ -24,13 +24,11 @@ static void query(const gchar *sql)
 	}
 }
 
-#include <string.h>
-
 static void log_to_db(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
 	sqlite3_stmt *stmt = NULL;
 
-	const gchar *sql = "INSERT INTO log (message) VALUES (?);";
+	const gchar *sql = "INSERT INTO log (level, message) VALUES (?, ?);";
 	gint rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	if (rc != SQLITE_OK)
 	{
@@ -39,7 +37,15 @@ static void log_to_db(const gchar *log_domain, GLogLevelFlags log_level, const g
 		exit(1);
 	}
 
-	rc = sqlite3_bind_text(stmt, 1, message, -1, SQLITE_STATIC);
+	rc = sqlite3_bind_int(stmt, 1, log_level & G_LOG_LEVEL_MASK);
+	if (rc != SQLITE_OK)
+	{
+		g_critical("Failed to bind log level to prepared statement: %s.", sqlite3_errstr(rc));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	rc = sqlite3_bind_text(stmt, 2, message, -1, SQLITE_STATIC);
 	if (rc != SQLITE_OK)
 	{
 		g_critical("Failed to bind log message to prepared statement: %s.", sqlite3_errstr(rc));
@@ -180,7 +186,7 @@ int main(gint argc, gchar **argv)
 		return 1;
 	}
 
-	query("CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP, message TEXT);");
+	query("CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP, level INTEGER, message TEXT);");
 
 	g_debug("Setting logging to highest level for database.");
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, log_to_db, NULL);
