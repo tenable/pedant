@@ -15,7 +15,9 @@ stamp-*
 /config.status
 /configure
 /configure.scan
-
 /pedant
+
+/src/.deps
+/src/.dirstamp
 /src/config.h
 /src/config.in

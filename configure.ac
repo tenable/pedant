@@ -11,7 +11,8 @@ AC_PROG_LEX
 AC_PROG_MKDIR_P
 AC_PROG_YACC
 
-PKG_CHECK_MODULES([DEPS], [glib-2.0 >= 2.34.3])
+PKG_CHECK_MODULES([glib], [glib-2.0 >= 2.34.3])
+PKG_CHECK_MODULES([sqlite], [sqlite3 >= 3.7.16])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
