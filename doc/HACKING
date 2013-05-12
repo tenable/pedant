@@ -1,0 +1,8 @@
+To generate the required files to build the project, run:
+
+    % aclocal
+    % autoconf
+    % autoheader
+    % automake
+
+From there, see the INSTALL file for instructions.

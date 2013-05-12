@@ -1,7 +1,14 @@
 *~
+\#*
+.\#*
 *.o
+stamp-*
+*.core
 
+/.deps
 /Makefile
+/Makefile.in
+/aclocal.m4
 /autom4te.cache
 /autoscan-*.log
 /config.log
@@ -9,4 +16,6 @@
 /configure
 /configure.scan
 
-/src/pedant
+/pedant
+/src/config.h
+/src/config.in

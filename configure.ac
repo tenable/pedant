@@ -1,21 +1,17 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-
 AC_PREREQ([2.69])
-AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_INIT([pedant], [0.0.1])
+AC_CONFIG_AUX_DIR([bin])
+AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/pedant.c])
-AC_CONFIG_HEADERS([config.h])
+AM_CONFIG_HEADER(src/config.h:src/config.in)
 
-# Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LEX
+AC_PROG_MKDIR_P
+AC_PROG_YACC
 
-# Checks for libraries.
-
-# Checks for header files.
-
-# Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
+PKG_CHECK_MODULES([DEPS], [glib-2.0 >= 2.34.3])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -1,0 +1,12 @@
+To build this project, run:
+
+    % ./configure
+    % make
+
+Then, to test this project, run:
+
+    % make test
+
+Then, to install this project, run:
+
+    % make install
