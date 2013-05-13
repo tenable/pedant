@@ -1,3 +1,4 @@
+[Autotools]
 To generate the required files to build the project, run:
 
     % aclocal
@@ -6,3 +7,28 @@ To generate the required files to build the project, run:
     % automake
 
 From there, see the INSTALL file for instructions.
+
+[Glib]
+Pedant is highly reliant on Glib, and uses the latter's types for all basic C
+types.
+
+[Logging]
+Glib provides a messaging architecture that Pedant uses for all its logging.
+Logs are sent to stdout or stderr at the verbosity level requested by the
+configuration, but are also recorded in the database at maximum verbosity. This
+permits replaying the logs of previous sessions at higher verbosity to help
+diagnose issues.
+
+Two functions are available for literal and printf-style logging:
+
+    logl(level, message)
+    logf(level, format, ...)
+
+There are several levels of logging available, defined as follows:
+
+1. MESSAGE: Messages to the user.
+2. ERROR: Unrecoverable coding errors, resulting in an immediate core dump.
+3. CRITICAL: Unrecoverable non-coding errors.
+4. WARN: Recoverable non-coding errors.
+5. INFO: Detailed information about current events.
+6. DEBUG: Insanely detailed, step-by-step rundown of all events.
