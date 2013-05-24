@@ -13,6 +13,7 @@
 int main(gint argc, gchar **argv)
 {
 	logl(DEBUG, "Starting session.");
+	cli_run(argc, argv);
 	logl(DEBUG, "Finished session.");
 
 	return 0;
