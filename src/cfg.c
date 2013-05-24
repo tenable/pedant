@@ -105,6 +105,7 @@ gboolean cfg_set_int(const gchar *key, gint val)
 	*val_copy = val;
 
 	g_hash_table_replace(cfg, key_copy, val_copy);
+	logf(DEBUG, "Set config key '%s' to integer value '%d'.", key, val);
 
 	return TRUE;
 }
@@ -129,6 +130,7 @@ gboolean cfg_set_str(const gchar *key, const gchar *val)
 	}
 
 	g_hash_table_replace(cfg, key_copy, val_copy);
+	logf(DEBUG, "Set config key '%s' to string value '%s'.", key, val);
 
 	return TRUE;
 }
