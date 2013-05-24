@@ -7,7 +7,10 @@ gboolean cfg_new(void)
 {
 	cfg = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	if (cfg == NULL)
+	{
 		logl(CRITICAL, "Failed to create the config hashtable.");
+		return FALSE;
+	}
 
 	const gchar *home = g_get_home_dir();
 	if (home == NULL)
