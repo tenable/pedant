@@ -1,6 +1,7 @@
 #include <glib.h>
 
 #include "cfg.h"
+#include "log.h"
 
 static gchar *opt_d = NULL;
 static gint opt_v = 0;
@@ -37,25 +38,20 @@ void cli_run(gint argc, gchar **argv)
 	cfg_set_str("database", opt_d);
 	cfg_set_int("verbosity", opt_v);
 
-	gchar *loglevel_name = NULL;
-	gint loglevel_enum = 0;
+	GLogLevelFlags lvl = 0;
 	switch (opt_v)
 	{
 	case 1:
-		loglevel_name = "warning";
-		loglevel_enum = G_LOG_LEVEL_WARNING;
+		lvl = G_LOG_LEVEL_WARNING;
 		break;
 	case 2:
-		loglevel_name = "debug";
-		loglevel_enum = G_LOG_LEVEL_DEBUG;
+		lvl = G_LOG_LEVEL_INFO;
+		break;
+	case 3:
+		lvl = G_LOG_LEVEL_DEBUG;
 		break;
 	}
 
-	log_set_verbosity();
-
-	if (loglevel_name != NULL)
-	{
-		g_debug("Changing message level to '%s'.", loglevel_name);
-		g_log_set_handler(G_LOG_DOMAIN, loglevel_enum, log_to_ui, NULL);
-	}
+	if (lvl > 0)
+		log_set_verbosity(lvl);
 }

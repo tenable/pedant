@@ -24,11 +24,18 @@ static void log_to_db(const gchar *domain, GLogLevelFlags lvl, const gchar *msg,
 
 gboolean log_new(void)
 {
-	logl(DEBUG, "Setting logging to lowest level for the UI.");
+	logl(DEBUG, "Setting logging to a low level for the UI.");
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, log_to_ui, NULL);
 
 	logl(DEBUG, "Setting logging to highest level for database.");
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, log_to_db, NULL);
+
+	return TRUE;
+}
+
+gboolean log_set_verbosity(GLogLevelFlags lvl)
+{
+	g_log_set_handler(G_LOG_DOMAIN, lvl, log_to_ui, NULL);
 
 	return TRUE;
 }

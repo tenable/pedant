@@ -12,8 +12,8 @@
 
 int main(gint argc, gchar **argv)
 {
-	g_debug("Starting session.");
-	g_debug("Finished session.");
+	logl(DEBUG, "Starting session.");
+	logl(DEBUG, "Finished session.");
 
 	return 0;
 }
