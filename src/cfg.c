@@ -118,14 +118,14 @@ gboolean cfg_set_str(const gchar *key, const gchar *val)
 	gchar *key_copy = g_strdup(key);
 	if (key_copy == NULL)
 	{
-		g_critical("Failed to create a copy of a key to add to the config.");
+		logl(CRITICAL, "Failed to create a copy of a key to add to the config.");
 		return FALSE;
 	}
 
 	gchar *val_copy = g_strdup(val);
 	if (val_copy == NULL)
 	{
-		g_critical("Failed to create a copy of an integer value to add to the config.");
+		logl(CRITICAL, "Failed to create a copy of an integer value to add to the config.");
 		return FALSE;
 	}
 
