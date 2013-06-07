@@ -7,7 +7,7 @@ prefix=/usr/local/pedant
 
 # These are things you can hopefully leave alone.
 CC=clang
-CFLAGS=-Wall -std=c99
+CFLAGS=-Wall -std=c99 -g
 INSTALL=install -p
 LDFLAGS=
 MAKE=make -e
@@ -15,8 +15,6 @@ MAKE=make -e
 ################################################################################
 # Top-Level Targets
 ################################################################################
-
-CFLAGS+=-D CHECK_DIR='"$(prefix)/share/checks"'
 
 all: engine
 
@@ -29,9 +27,8 @@ clean: engine-clean
 ################################################################################
 
 .PHONY: engine
-engine: engine/pedant.o tokenizer
-	@echo [LD] pedant
-	@$(CC) $(LDFLAGS) -o pedant engine/*.o engine/tokenizer/*.o
+engine: parser tokenizer pedant.o
+	$(CC) $(LDFLAGS) -o pedant *.o
 
 .PHONY: engine-install
 engine-install:
@@ -39,17 +36,9 @@ engine-install:
 
 .PHONY: engine-clean
 engine-clean:
-	@echo [RM] engine/*.o
-	@rm -f engine/*.o
-
-	@echo [RM] engine/*/*.o
-	@rm -f engine/*/*.o
-
-	@echo [RM] engine/tokenizer/tokenizer.c
-	@rm -f engine/tokenizer/tokenizer.c
-
-	@echo [RM] engine/parser/y.tab.*
-	@rm -f engine/parser/y.tab.*
+	rm -f *.o
+	rm -f tokenizer.c
+	rm -f parser.[ch]
 
 ################################################################################
 # Engine :: Command Line Interface
@@ -61,24 +50,24 @@ engine-clean:
 # Engine :: Parser
 ################################################################################
 
-engine/parser/y.tab.o: engine/parser/grammar.y
-	@echo [YY] $^
-	@bison -d -o engine/parser/y.tab.c $^
-	@echo [CC] $@
-	@$(CC) $(CFLAGS) -c -o $@ engine/parser/y.tab.c
+.PHONY: parser
+parser: parser.o
+
+parser.o: parser.y
+	bison -o parser.c $^
+	$(CC) $(CFLAGS) -c -o $@ parser.c
 
 ################################################################################
 # Engine :: Tokenizer
 ################################################################################
 
-tokenizer: engine/tokenizer/token.o engine/tokenizer/tokenizer.o engine/tokenizer/token_types.o
+.PHONY: tokenizer
+tokenizer: token.o tokenizer.o token_types.o
 
-engine/tokenizer/tokenizer.o: engine/tokenizer/tokenizer.l
-	@# Note: -o cannot have a space before the path.
-	@echo [LL] $<
-	@flex -oengine/tokenizer/tokenizer.c $<
-	@echo [CC] $@
-	@$(CC) $(CFLAGS) -c -o $@ engine/tokenizer/tokenizer.c
+tokenizer.o: tokenizer.l
+	# Note: -o cannot have a space before the path.
+	flex -otokenizer.c $<
+	$(CC) $(CFLAGS) -c -o $@ tokenizer.c
 
 ################################################################################
 # Scripts
@@ -97,5 +86,4 @@ test-install:
 ################################################################################
 
 %.o: %.c
-	@echo [CC] $@
-	@$(CC) $(CFLAGS) -c -o $@ $^
+	$(CC) $(CFLAGS) -c -o $@ $^

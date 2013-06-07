@@ -1,5 +1,5 @@
-#ifndef TYPES_H_
-#define TYPES_H_
+#ifndef TOKEN_TYPES_H_
+#define TOKEN_TYPES_H_
 
 typedef enum
 {

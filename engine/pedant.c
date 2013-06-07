@@ -1,7 +1,7 @@
 #include <err.h>
 #include <stdlib.h>
 
-#include "tokenizer/tokenizer.h"
+#include "tokenizer.h"
 
 void tokenize(const char *path)
 {
@@ -24,10 +24,28 @@ void tokenize(const char *path)
 	tokenizer_unload();
 }
 
+void parse(const char *path)
+{
+	tokenizer_comments(false);
+
+	FILE *f = fopen(path, "r");
+	if (f == NULL)
+		err(EXIT_FAILURE, "Failed to open '%s'", path);
+
+	tokenizer_load(fopen(path, "r"));
+
+	parser_run();
+
+	tokenizer_unload();
+}
+
 int main(int argc, const char **argv, const char **envp)
 {
 	for (int i = 1; i < argc; i++)
+	{
 		tokenize(argv[i]);
+		parse(argv[i]);
+	}
 
 	return EXIT_SUCCESS;
 }
