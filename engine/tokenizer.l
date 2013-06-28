@@ -10,7 +10,9 @@ static fpos_t position = 0;
 static bool emit_comments = false;
 static tok_t *yylval = NULL;
 
-extern FILE *yyin;
+static YY_BUFFER_STATE yybuf = NULL;
+
+extern int yyleng;
 extern int yylex(void);
 %}
 
@@ -32,100 +34,108 @@ whitespace		[[:space:]]+
 
 %%
 
-"break"			return make_token(BREAK);
-"continue"		return make_token(CONTINUE);
-"else"			return make_token(ELSE);
-"export"		return make_token(EXPORT);
-"for"			return make_token(FOR);
-"foreach"		return make_token(FOREACH);
-"function"		return make_token(FUNCTION);
-"global_var"		return make_token(GLOBAL);
-"if"			return make_token(IF);
-"import"		return make_token(IMPORT);
-"include"		return make_token(INCLUDE);
-"local_var"		return make_token(LOCAL);
-"repeat"		return make_token(REPEAT);
-"return"		return make_token(RETURN);
-"until"			return make_token(UNTIL);
-"x"			return make_token(REP);
-"while"			return make_token(WHILE);
+"break"			return make_token(TOK_BREAK);
+"continue"		return make_token(TOK_CONTINUE);
+"else"			return make_token(TOK_ELSE);
+"export"		return make_token(TOK_EXPORT);
+"for"			return make_token(TOK_FOR);
+"foreach"		return make_token(TOK_FOREACH);
+"function"		return make_token(TOK_FUNCTION);
+"global_var"		return make_token(TOK_GLOBAL);
+"if"			return make_token(TOK_IF);
+"import"		return make_token(TOK_IMPORT);
+"include"		return make_token(TOK_INCLUDE);
+"local_var"		return make_token(TOK_LOCAL);
+"repeat"		return make_token(TOK_REPEAT);
+"return"		return make_token(TOK_RETURN);
+"until"			return make_token(TOK_UNTIL);
+"x"			return make_token(TOK_REP);
+"while"			return make_token(TOK_WHILE);
 
-"FALSE"			return make_token(FALSE);
-"NULL"			return make_token(UNDEF);
-"TRUE"			return make_token(TRUE);
+"FALSE"			return make_token(TOK_FALSE);
+"NULL"			return make_token(TOK_UNDEF);
+"TRUE"			return make_token(TOK_TRUE);
 
-"><"			return make_token(SUBSTR_EQ);
-">!<"			return make_token(SUBSTR_NE);
+"><"			return make_token(TOK_SUBSTR_EQ);
+">!<"			return make_token(TOK_SUBSTR_NE);
 
-"=~"			return make_token(REGEX_EQ);
-"!~"			return make_token(REGEX_NE);
+"=~"			return make_token(TOK_REGEX_EQ);
+"!~"			return make_token(TOK_REGEX_NE);
 
-"=="			return make_token(CMP_EQ);
-"!="			return make_token(CMP_NE);
-"<="			return make_token(CMP_LE);
-">="			return make_token(CMP_GE);
+"=="			return make_token(TOK_CMP_EQ);
+"!="			return make_token(TOK_CMP_NE);
+"<="			return make_token(TOK_CMP_LE);
+">="			return make_token(TOK_CMP_GE);
 
-"="			return make_token(ASS_EQ);
-"+="			return make_token(ADD_EQ);
-"-="			return make_token(SUB_EQ);
-"*="			return make_token(MUL_EQ);
-"/="			return make_token(DIV_EQ);
-"%="			return make_token(MOD_EQ);
-">>="			return make_token(SRL_EQ);
-">>>="			return make_token(SRA_EQ);
-"<<="			return make_token(SLL_EQ);
+"="			return make_token(TOK_ASS_EQ);
+"+="			return make_token(TOK_ADD_EQ);
+"-="			return make_token(TOK_SUB_EQ);
+"*="			return make_token(TOK_MUL_EQ);
+"/="			return make_token(TOK_DIV_EQ);
+"%="			return make_token(TOK_MOD_EQ);
+">>="			return make_token(TOK_SRL_EQ);
+">>>="			return make_token(TOK_SRA_EQ);
+"<<="			return make_token(TOK_SLL_EQ);
 
-"||"			return make_token(OR);
-"&&"			return make_token(AND);
-"!"			return make_token(NOT);
+"||"			return make_token(TOK_OR);
+"&&"			return make_token(TOK_AND);
+"!"			return make_token(TOK_NOT);
 
-"|"			return make_token(BIT_OR);
-"^"			return make_token(BIT_XOR);
-"&"			return make_token(BIT_AND);
-">>>"			return make_token(BIT_SRA);
-">>"			return make_token(BIT_SRL);
-"<<"			return make_token(BIT_SLL);
+"|"			return make_token(TOK_BIT_OR);
+"^"			return make_token(TOK_BIT_XOR);
+">>>"			return make_token(TOK_BIT_SRA);
+">>"			return make_token(TOK_BIT_SRL);
+"<<"			return make_token(TOK_BIT_SLL);
 
-"<"			return make_token(CMP_LT);
-">"			return make_token(CMP_GT);
+"<"			return make_token(TOK_CMP_LT);
+">"			return make_token(TOK_CMP_GT);
 
-"++"			return make_token(INCR);
-"--"			return make_token(DECR);
+"++"			return make_token(TOK_INCR);
+"--"			return make_token(TOK_DECR);
 
-"**"			return make_token(EXP);
+"**"			return make_token(TOK_EXP);
 
-"+"			return make_token(ADD);
-"-"			return make_token(SUB);
-"*"			return make_token(MUL);
-"/"			return make_token(DIV);
-"%"			return make_token(MOD);
+"+"			return make_token(TOK_ADD);
+"-"			return make_token(TOK_SUB);
+"*"			return make_token(TOK_MUL);
+"/"			return make_token(TOK_DIV);
+"%"			return make_token(TOK_MOD);
 
-"~"			return make_token(BIT_NOT);
+"~"			return make_token(TOK_BIT_NOT);
 
-"."			return make_token(PERIOD);
-","			return make_token(COMMA);
-":"			return make_token(COLON);
-";"			return make_token(SEMICOLON);
-"("			return make_token(LPAREN);
-")"			return make_token(RPAREN);
-"["			return make_token(LBRACK);
-"]"			return make_token(RBRACK);
-"{"			return make_token(LBRACE);
-"}"			return make_token(RBRACE);
-"@"			return make_token(ATSIGN);
+"."			return make_token(TOK_PERIOD);
+","			return make_token(TOK_COMMA);
+":"			return make_token(TOK_COLON);
+";"			return make_token(TOK_SEMICOLON);
+"("			return make_token(TOK_LPAREN);
+")"			return make_token(TOK_RPAREN);
+"["			return make_token(TOK_LBRACK);
+"]"			return make_token(TOK_RBRACK);
+"{"			return make_token(TOK_LBRACE);
+"}"			return make_token(TOK_RBRACE);
 
-{ident}			return make_token(IDENT);
+"@"			return make_token(TOK_AT_SIGN);
+"&"			return make_token(TOK_AMPERSAND);
 
-0[xX]{hexdigits}	return make_token(INTEGER);
-0{octdigits}		return make_token(INTEGER);
-{decdigits}		return make_token(INTEGER);
+{ident}			return make_token(TOK_IDENT);
 
-'{data}'		return make_token(DATA);
-\"{string}\"		return make_token(STRING);
+0[xX]{hexdigits}	return make_token(TOK_INTEGER);
+0{octdigits}		return make_token(TOK_INTEGER);
+{decdigits}		return make_token(TOK_INTEGER);
 
-{comment}		if (emit_comments) return make_token(COMMENT);
+'{data}'		return make_token(TOK_DATA);
+\"{string}\"		return make_token(TOK_STRING);
 
-{whitespace}		/* Ignored. */
+{comment}		{
+				if (emit_comments)
+					return make_token(TOK_COMMENT);
+				else
+					position += yyleng;
+			}
+
+{whitespace}		position += yyleng;
+
+.			return make_token(TOK_UNRECOGNIZED);
 
 %%
 
@@ -139,9 +149,8 @@ static int make_token(tok_id_t type)
 	assert(yylval == NULL);
 
 	// Produce a new token.
-	size_t len = strlen(yytext);
-	yylval = token_new(type, position, len);
-	position += len;
+	yylval = token_new(type, position, yyleng);
+	position += yyleng;
 
 	return type;
 }
@@ -170,7 +179,7 @@ void tokenizer_comments(bool choice)
 tok_t *tokenizer_get_one(void)
 {
 	tok_id_t id = yylex();
-	if (id <= 0)
+	if (id == 0)
 		return NULL;
 
 	return read_token();
@@ -182,16 +191,23 @@ tok_t *tokenizer_get_all(void)
 	return NULL;
 }
 
-void tokenizer_load(FILE *src)
+void tokenizer_load(char *src, size_t len)
 {
+	assert(yybuf == NULL);
 	assert(src != NULL);
+	assert(len >= 0);
 
-	yyin = src;
+	yybuf = yy_scan_bytes(src, len);
+
+	yylval = NULL;
+	position = 0;
 }
 
 void tokenizer_unload(void)
 {
-	assert(yyin != NULL);
+	assert(yybuf != NULL);
 
-	yyin = NULL;
+	yy_delete_buffer(yybuf);
+
+	yybuf = NULL;
 }

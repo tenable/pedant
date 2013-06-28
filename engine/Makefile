@@ -7,7 +7,7 @@ prefix=/usr/local/pedant
 
 # These are things you can hopefully leave alone.
 CC=clang
-CFLAGS=-Wall -std=c99 -g
+CFLAGS=-Wall -std=c99 -g -Wstrict-prototypes
 INSTALL=install -p
 LDFLAGS=
 MAKE=make -e

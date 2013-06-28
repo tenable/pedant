@@ -8,10 +8,10 @@
 
 extern const struct token_type types[];
 
-tok_t *token_new(tok_id_t type, fpos_t start, size_t length)
+tok_t *token_new(tok_id_t type, fpos_t start, size_t len)
 {
-	assert(type > 0);
-	assert(length != 0);
+	assert(type >= 0);
+	assert(len != 0);
 
 	// XXX-MAK: Change to use pool allocation later.
 	// Allocate space for the token.
@@ -20,7 +20,7 @@ tok_t *token_new(tok_id_t type, fpos_t start, size_t length)
 		err(EXIT_FAILURE, "malloc() of token failed");
 
 	// Initialize the temporary token on the stack.
-	tok_t tmp = {type, start, length};
+	tok_t tmp = {type, start, len};
 
 	// Copy the temporary token to the heap.
 	memcpy(tok, &tmp, sizeof(*tok));
@@ -68,11 +68,11 @@ const char *token_type_name(const tok_t *tok)
 	return NULL;
 }
 
-void token_dump(const tok_t *tok, char *buf, size_t length)
+void token_dump(const tok_t *tok, char *buf, size_t len)
 {
 	assert(tok != NULL);
 	assert(buf != NULL);
-	assert(length > 0);
+	assert(len > 0);
 
-	snprintf(buf, length, "(%s %lu %lu)", token_type_name(tok), tok->start, tok->length);
+	snprintf(buf, len, "(%s %lu %lu)", token_type_name(tok), tok->start, tok->length);
 }
