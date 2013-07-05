@@ -54,7 +54,7 @@ engine-clean:
 parser: parser.o
 
 parser.o: parser.y
-	bison -d -t -v -o parser.c $<
+	bison -d -o parser.c $<
 	$(CC) $(CFLAGS) -c -o $@ parser.c
 
 ################################################################################
