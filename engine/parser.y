@@ -1,73 +1,83 @@
 %{
-#include <stdint.h>
-#include <stdio.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <err.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+struct token;
 
 #include "tokenizer.h"
 
-#define YYTOKENTYPE tok_id_t
-
 extern int yylex(void);
-extern void yyerror(const char *);
+
+void yyerror(const char *);
 %}
 
 %union {
-	tok_t * tok;
+	struct token *tok;
 }
+
+/* XXX-MAK: Fix the precedence of the new 5.2 operators. */
 
 /* Settings */
 %start start
 %expect 1
 
 /* Keywords */
-%token <tok> BREAK CONTINUE ELSE EXPORT FOR FOREACH FUNCTION GLOBAL IF IMPORT INCLUDE
-%token <tok> LOCAL REPEAT RETURN UNTIL REP WHILE
+%token <tok> TOK_BREAK TOK_CONTINUE TOK_ELSE TOK_EXPORT TOK_FOR TOK_FOREACH TOK_FUNCTION TOK_GLOBAL TOK_IF TOK_IMPORT TOK_INCLUDE
+%token <tok> TOK_LOCAL TOK_REPEAT TOK_RETURN TOK_UNTIL TOK_REP TOK_WHILE
 
 /* Constants */
-%token <tok> FALSE UNDEF TRUE
+%token <tok> TOK_FALSE TOK_UNDEF TOK_TRUE
 
 /* Operators */
-%token <tok> SUBSTR_EQ SUBSTR_NE
-%token <tok> REGEX_EQ REGEX_NE
-%token <tok> CMP_EQ CMP_NE CMP_LE CMP_GE
-%token <tok> ASS_EQ ADD_EQ SUB_EQ MUL_EQ DIV_EQ MOD_EQ SRL_EQ SRA_EQ SLL_EQ
-%token <tok> OR AND NOT
-%token <tok> BIT_OR BIT_XOR BIT_AND BIT_SRA BIT_SRL BIT_SLL
-%token <tok> CMP_LT CMP_GT
-%token <tok> INCR DECR
-%token <tok> EXP
-%token <tok> ADD SUB MUL DIV MOD
-%token <tok> BIT_NOT
-%token <tok> PERIOD COMMA COLON SEMICOLON LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
+%token <tok> TOK_TOK_SUBSTR_EQ TOK_TOK_SUBSTR_NE
+%token <tok> TOK_REGEX_EQ TOK_REGEX_NE
+%token <tok> TOK_CMP_EQ TOK_CMP_NE TOK_CMP_LE TOK_CMP_GE
+%token <tok> TOK_ASS_EQ TOK_ADD_EQ TOK_SUB_EQ TOK_MUL_EQ TOK_DIV_EQ TOK_MOD_EQ TOK_SRL_EQ TOK_SRA_EQ TOK_SLL_EQ
+%token <tok> TOK_OR TOK_AND TOK_NOT
+%token <tok> TOK_BIT_OR TOK_BIT_XOR TOK_AMPERSAND TOK_BIT_SRA TOK_BIT_SRL TOK_BIT_SLL
+%token <tok> TOK_CMP_LT TOK_CMP_GT
+%token <tok> TOK_INCR TOK_DECR
+%token <tok> TOK_EXP
+%token <tok> TOK_ADD TOK_SUB TOK_MUL TOK_DIV TOK_MOD
+%token <tok> TOK_BIT_NOT
+%token <tok> TOK_PERIOD TOK_COMMA TOK_COLON TOK_SEMICOLON TOK_LPAREN TOK_RPAREN TOK_LBRACK TOK_RBRACK TOK_LBRACE TOK_RBRACE
+%token <tok> TOK_AT_SIGN
 
 /* Literals */
-%token <tok> IDENT INTEGER DATA STRING
+%token <tok> TOK_IDENT TOK_INTEGER TOK_DATA TOK_STRING
 
 /* Miscellanea */
-%token <tok> COMMENT
+%token <tok> TOK_COMMENT TOK_UNRECOGNIZED
 
 /* Precedence */
-%right ASS_EQ ADD_EQ SUB_EQ MUL_EQ DIV_EQ MOD_EQ SLL_EQ SRA_EQ SRL_EQ
-%left OR
-%left AND
-%nonassoc CMP_LT CMP_GT CMP_EQ CMP_NE CMP_GE CMP_LE SUBSTR_EQ SUBSTR_NE REGEX_EQ REGEX_NE
-%left BIT_OR
-%left BIT_XOR
-%left BIT_AND
-%nonassoc BIT_SRA BIT_SRL BIT_SLL
-%left ADD SUB
-%left MUL DIV MOD
-%nonassoc NOT
-%nonassoc UMINUS BIT_NOT
-%right EXP
-%nonassoc INCR DECR
-%nonassoc ARROW
+%right TOK_ASS_EQ TOK_ADD_EQ TOK_SUB_EQ TOK_MUL_EQ TOK_DIV_EQ TOK_MOD_EQ TOK_SLL_EQ TOK_SRA_EQ TOK_SRL_EQ
+%left TOK_OR
+%left TOK_AND
+%nonassoc TOK_CMP_LT TOK_CMP_GT TOK_CMP_EQ TOK_CMP_NE TOK_CMP_GE TOK_CMP_LE TOK_SUBSTR_EQ TOK_SUBSTR_NE TOK_REGEX_EQ TOK_REGEX_NE
+%left TOK_BIT_OR
+%left TOK_BIT_XOR
+%left TOK_AMPERSAND
+%nonassoc TOK_BIT_SRA TOK_BIT_SRL TOK_BIT_SLL
+%left TOK_ADD TOK_SUB
+%left TOK_MUL TOK_DIV TOK_MOD
+%nonassoc TOK_NOT
+%nonassoc TOK_UMINUS TOK_BIT_NOT
+%right TOK_EXP
+%nonassoc TOK_INCR TOK_DECR
+%nonassoc TOK_ARROW
 
 /* Non-terminals */
 %type <tok> arg args assign assign_exp block break call call_exp compound continue
 %type <tok> decr decr_exp empty export expr field for foreach function global ident
 %type <tok> idents if import include incr incr_exp indexes int ip local lval params
 %type <tok> rep repeat return root roots simple start statement statements text undef
-%type <tok> while
+%type <tok> unrecognized while
 
 %%
 
@@ -93,6 +103,8 @@ root		: export
 		{  }
 		| statement
 		{  }
+		| unrecognized
+		{  }
 		;
 
 statement	: simple
@@ -105,13 +117,13 @@ statement	: simple
  * Root Statements
  ******************************************************************************/
 
-export		: EXPORT function
+export		: TOK_EXPORT function
 		{  }
 		;
 
-function	: FUNCTION ident LPAREN params RPAREN block
+function	: TOK_FUNCTION ident TOK_LPAREN params TOK_RPAREN block
 		{  }
-		| FUNCTION ident LPAREN RPAREN block
+		| TOK_FUNCTION ident TOK_LPAREN TOK_RPAREN block
 		{  }
 		;
 
@@ -157,61 +169,65 @@ compound	: block
 		{  }
 		;
 
+unrecognized	: TOK_UNRECOGNIZED
+		{ errx(1, "UNRECOGNIZED TOKEN"); }
+		;
+
 /******************************************************************************
  * Simple Statements
  ******************************************************************************/
 
-assign		: assign_exp SEMICOLON
+assign		: assign_exp TOK_SEMICOLON
 		{  }
 		;
 
-break		: BREAK SEMICOLON
+break		: TOK_BREAK TOK_SEMICOLON
 		{  }
 		;
 
-call		: call_exp SEMICOLON
+call		: call_exp TOK_SEMICOLON
 		{  }
 		;
 
-continue	: CONTINUE SEMICOLON
+continue	: TOK_CONTINUE TOK_SEMICOLON
 		{  }
 		;
 
-decr		: decr_exp SEMICOLON
+decr		: decr_exp TOK_SEMICOLON
 		{  }
 		;
 
-empty		: SEMICOLON
+empty		: TOK_SEMICOLON
 		{  }
 		;
 
-global		: GLOBAL idents SEMICOLON
+global		: TOK_GLOBAL idents TOK_SEMICOLON
 		{  }
 		;
 
-incr		: incr_exp SEMICOLON
+incr		: incr_exp TOK_SEMICOLON
 		{  }
 		;
 
-import		: IMPORT LPAREN text RPAREN SEMICOLON
+import		: TOK_IMPORT TOK_LPAREN text TOK_RPAREN TOK_SEMICOLON
 		{  }
 		;
 
-include		: INCLUDE LPAREN text RPAREN SEMICOLON
+include		: TOK_INCLUDE TOK_LPAREN text TOK_RPAREN TOK_SEMICOLON
 		{  }
 		;
 
-local		: LOCAL idents SEMICOLON
+local		: TOK_LOCAL idents TOK_SEMICOLON
 		{  }
 		;
 
-rep		: call_exp REP expr SEMICOLON
+rep		: call_exp TOK_REP expr TOK_SEMICOLON
 		{  }
 		;
 
-return		: RETURN expr SEMICOLON
+return		: TOK_RETURN expr TOK_SEMICOLON
 		{  }
-		| RETURN SEMICOLON
+		| TOK_RETURN TOK_SEMICOLON
 		{  }
 		;
 
@@ -219,31 +235,31 @@ return		: RETURN expr SEMICOLON
  * Compound Statements
  ******************************************************************************/
 
-block		: LBRACE statements RBRACE
+block		: TOK_LBRACE statements TOK_RBRACE
 		{  }
-		| LBRACE RBRACE
-		{  }
-		;
-
-for		: FOR LPAREN field SEMICOLON expr SEMICOLON field RPAREN statement
+		| TOK_LBRACE TOK_RBRACE
 		{  }
 		;
 
-foreach		: FOREACH ident LPAREN expr RPAREN statement
+for		: TOK_FOR TOK_LPAREN field TOK_SEMICOLON expr TOK_SEMICOLON field TOK_RPAREN statement
 		{  }
 		;
 
-if		: IF LPAREN expr RPAREN statement
-		{  }
-		| IF LPAREN expr RPAREN statement ELSE statement
+foreach		: TOK_FOREACH ident TOK_LPAREN expr TOK_RPAREN statement
 		{  }
 		;
 
-repeat		: REPEAT statement UNTIL expr SEMICOLON
+if		: TOK_IF TOK_LPAREN expr TOK_RPAREN statement
+		{  }
+		| TOK_IF TOK_LPAREN expr TOK_RPAREN statement TOK_ELSE statement
 		{  }
 		;
 
-while		: WHILE LPAREN expr RPAREN statement
+repeat		: TOK_REPEAT statement TOK_UNTIL expr TOK_SEMICOLON
+		{  }
+		;
+
+while		: TOK_WHILE TOK_LPAREN expr TOK_RPAREN statement
 		{  }
 		;
 
@@ -251,103 +267,103 @@ while		: WHILE LPAREN expr RPAREN statement
  * Expressions
  ******************************************************************************/
 
-assign_exp	: lval ASS_EQ expr
+assign_exp	: lval TOK_ASS_EQ expr
 		{  }
-		| lval ADD_EQ expr
+		| lval TOK_ADD_EQ expr
 		{  }
-		| lval SUB_EQ expr
+		| lval TOK_SUB_EQ expr
 		{  }
-		| lval MUL_EQ expr
+		| lval TOK_MUL_EQ expr
 		{  }
-		| lval DIV_EQ expr
+		| lval TOK_DIV_EQ expr
 		{  }
-		| lval MOD_EQ expr
+		| lval TOK_MOD_EQ expr
 		{  }
-		| lval SRL_EQ expr
+		| lval TOK_SRL_EQ expr
 		{  }
-		| lval SRA_EQ expr
+		| lval TOK_SRA_EQ expr
 		{  }
-		| lval SLL_EQ expr
-		{  }
-		;
-
-call_exp	: ident LPAREN args RPAREN
-		{  }
-		| ident LPAREN RPAREN
+		| lval TOK_SLL_EQ expr
 		{  }
 		;
 
-decr_exp	: DECR lval
+call_exp	: ident TOK_LPAREN args TOK_RPAREN
 		{  }
-		| lval DECR
-		{  }
-		;
-
-incr_exp	: INCR lval
-		{  }
-		| lval INCR
+		| ident TOK_LPAREN TOK_RPAREN
 		{  }
 		;
 
-expr		: LPAREN expr RPAREN
+decr_exp	: TOK_DECR lval
 		{  }
-		| expr AND expr
+		| lval TOK_DECR
 		{  }
-		| NOT expr
+		;
+
+incr_exp	: TOK_INCR lval
 		{  }
-		| expr OR expr
+		| lval TOK_INCR
 		{  }
-		| expr ADD expr
+		;
+
+expr		: TOK_LPAREN expr TOK_RPAREN
 		{  }
-		| expr SUB expr
+		| expr TOK_AND expr
 		{  }
-		| SUB expr %prec UMINUS
+		| TOK_NOT expr
 		{  }
-		| BIT_NOT expr
+		| expr TOK_OR expr
 		{  }
-		| expr MUL expr
+		| expr TOK_ADD expr
 		{  }
-		| expr EXP expr
+		| expr TOK_SUB expr
 		{  }
-		| expr DIV expr
+		| TOK_SUB expr %prec TOK_UMINUS
 		{  }
-		| expr MOD expr
+		| TOK_BIT_NOT expr
 		{  }
-		| expr BIT_AND expr
+		| expr TOK_MUL expr
 		{  }
-		| expr BIT_XOR expr
+		| expr TOK_EXP expr
 		{  }
-		| expr BIT_OR expr
+		| expr TOK_DIV expr
 		{  }
-		| expr BIT_SRA expr
+		| expr TOK_MOD expr
 		{  }
-		| expr BIT_SRL expr
+		| expr TOK_AMPERSAND expr
 		{  }
-		| expr BIT_SLL expr
+		| expr TOK_BIT_XOR expr
+		{  }
+		| expr TOK_BIT_OR expr
+		{  }
+		| expr TOK_BIT_SRA expr
+		{  }
+		| expr TOK_BIT_SRL expr
+		{  }
+		| expr TOK_BIT_SLL expr
 		{  }
 		| incr_exp
 		{  }
 		| decr_exp
 		{  }
-		| expr SUBSTR_EQ expr
+		| expr TOK_SUBSTR_EQ expr
 		{  }
-		| expr SUBSTR_NE expr
+		| expr TOK_SUBSTR_NE expr
 		{  }
-		| expr REGEX_EQ expr
+		| expr TOK_REGEX_EQ expr
 		{  }
-		| expr REGEX_NE expr
+		| expr TOK_REGEX_NE expr
 		{  }
-		| expr CMP_LT expr
+		| expr TOK_CMP_LT expr
 		{  }
-		| expr CMP_GT expr
+		| expr TOK_CMP_GT expr
 		{  }
-		| expr CMP_EQ expr
+		| expr TOK_CMP_EQ expr
 		{  }
-		| expr CMP_NE expr
+		| expr TOK_CMP_NE expr
 		{  }
-		| expr CMP_GE expr
+		| expr TOK_CMP_GE expr
 		{  }
-		| expr CMP_LE expr
+		| expr TOK_CMP_LE expr
 		{  }
 		| assign_exp
 		{  }
@@ -369,7 +385,7 @@ expr		: LPAREN expr RPAREN
  * Named Components
  ******************************************************************************/
 
-arg		: ident COLON expr
+arg		: ident TOK_COLON expr
 		{  }
 		| expr
 		{  }
@@ -385,7 +401,7 @@ lval		: ident indexes
  * Anonymous Components
  ******************************************************************************/
 
-args		: arg COMMA args
+args		: arg TOK_COMMA args
 		{  }
 		| arg
 		{  }
@@ -403,19 +419,19 @@ field		: assign_exp
 		{  }
 		;
 
-idents		: ident COMMA idents
+idents		: ident TOK_COMMA idents
 		{  }
 		| ident
 		{  }
 		;
 
-indexes		: LBRACK expr RBRACK indexes
+indexes		: TOK_LBRACK expr TOK_RBRACK indexes
 		{  }
-		| LBRACK expr RBRACK
+		| TOK_LBRACK expr TOK_RBRACK
 		{  }
 		;
 
-params		: ident COMMA params
+params		: ident TOK_COMMA params
 		{  }
 		| ident
 		{  }
@@ -431,31 +447,31 @@ statements	: statement statements
  * Literals
  ******************************************************************************/
 
-ident		: IDENT
+ident		: TOK_IDENT
 		{  }
-		| REP
-		{  }
-		;
-
-int		: INTEGER
-		{  }
-		| FALSE
-		{  }
-		| TRUE
+		| TOK_REP
 		{  }
 		;
 
-ip		: int PERIOD int PERIOD int PERIOD int
+int		: TOK_INTEGER
+		{  }
+		| TOK_FALSE
+		{  }
+		| TOK_TRUE
 		{  }
 		;
 
-text		: DATA
-		{  }
-		| STRING
+ip		: int TOK_PERIOD int TOK_PERIOD int TOK_PERIOD int
 		{  }
 		;
 
-undef		: UNDEF
+text		: TOK_DATA
+		{  }
+		| TOK_STRING
+		{  }
+		;
+
+undef		: TOK_UNDEF
 		{  }
 		;
 
@@ -463,10 +479,20 @@ undef		: UNDEF
 
 void yyerror(const char *msg)
 {
-	printf("%s\n", msg);
+	warnx("%s", msg);
 }
 
-void parser_run(void)
+void parse(const char *src, size_t len)
 {
-	printf("HI!\n");
+	tokenizer_comments(false);
+
+	tokenizer_load(src, len);
+
+	yydebug = 1;
+
+	int rc = yyparse();
+	if (rc != 0)
+		warnx("PARSE FAILED");
+
+	tokenizer_unload();
 }

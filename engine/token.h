@@ -3,9 +3,17 @@
 
 #include <stdio.h>
 
-#include "token_types.h"
+#include "parser.h"
 
-typedef struct
+typedef enum yytokentype tok_id_t;
+
+struct token_type
+{
+	const tok_id_t	 num;
+	const char	*str;
+};
+
+typedef struct token
 {
 	const tok_id_t	 type;
 	const fpos_t	 start;

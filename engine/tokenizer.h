@@ -8,7 +8,7 @@
 void tokenizer_comments(bool choice);
 tok_t *tokenizer_get_one(void);
 tok_t *tokenizer_get_all(void);
-void tokenizer_load(char *src, size_t len);
+void tokenizer_load(const char *src, size_t len);
 void tokenizer_unload(void);
 
 #endif

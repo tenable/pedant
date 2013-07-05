@@ -8,7 +8,6 @@ static int make_token(tok_id_t);
 
 static fpos_t position = 0;
 static bool emit_comments = false;
-static tok_t *yylval = NULL;
 
 static YY_BUFFER_STATE yybuf = NULL;
 
@@ -145,26 +144,11 @@ whitespace		[[:space:]]+
 
 static int make_token(tok_id_t type)
 {
-	// Ensure that someone has consumed the previous token.
-	assert(yylval == NULL);
-
 	// Produce a new token.
-	yylval = token_new(type, position, yyleng);
+	yylval.tok = token_new(type, position, yyleng);
 	position += yyleng;
 
 	return type;
-}
-
-static tok_t *read_token(void)
-{
-	// Ensure that nobody has consumed the previous token.
-	assert(yylval != NULL);
-
-	// Consume the token.
-	tok_t *tok = yylval;
-	yylval = NULL;
-
-	return tok;
 }
 
 /******************************************************************************
@@ -182,7 +166,7 @@ tok_t *tokenizer_get_one(void)
 	if (id == 0)
 		return NULL;
 
-	return read_token();
+	return yylval.tok;
 }
 
 tok_t *tokenizer_get_all(void)
@@ -191,15 +175,15 @@ tok_t *tokenizer_get_all(void)
 	return NULL;
 }
 
-void tokenizer_load(char *src, size_t len)
+void tokenizer_load(const char *src, size_t len)
 {
 	assert(yybuf == NULL);
 	assert(src != NULL);
 	assert(len >= 0);
 
 	yybuf = yy_scan_bytes(src, len);
+	yylval.tok = NULL;
 
-	yylval = NULL;
 	position = 0;
 }
 

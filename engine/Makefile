@@ -54,7 +54,7 @@ engine-clean:
 parser: parser.o
 
 parser.o: parser.y
-	bison -o parser.c $^
+	bison -d -t -v -o parser.c $<
 	$(CC) $(CFLAGS) -c -o $@ parser.c
 
 ################################################################################
@@ -62,7 +62,7 @@ parser.o: parser.y
 ################################################################################
 
 .PHONY: tokenizer
-tokenizer: token.o tokenizer.o token_types.o
+tokenizer: token.o tokenizer.o
 
 tokenizer.o: tokenizer.l
 	# Note: -o cannot have a space before the path.
