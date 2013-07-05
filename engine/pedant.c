@@ -4,11 +4,11 @@
 
 #include <err.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include "parser.h"
-#include "tokenizer.h"
 
 void parsify(const char *path)
 {
@@ -23,12 +23,15 @@ void parsify(const char *path)
 	if (mm == NULL)
 		err(EXIT_FAILURE, "Failed to mmap '%s'", path);
 
-	parse(mm, sb.st_size);
+	bool res = parse(mm, sb.st_size);
 
 	if (munmap(mm, sb.st_size) == -1)
 		err(EXIT_FAILURE, "Failed to munmap '%s'", path);
 
 	close(fd);
+
+	if (!res)
+		printf("Failed to parse: %s\n", path);
 }
 
 int main(int argc, const char **argv, const char **envp)

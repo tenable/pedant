@@ -18,7 +18,12 @@ void yyerror(const char *);
 %}
 
 %union {
+	#include <stdbool.h>
 	struct token *tok;
+}
+
+%code provides {
+	bool parse(const char *src, size_t len);
 }
 
 /* XXX-MAK: Fix the precedence of the new 5.2 operators. */
@@ -170,7 +175,7 @@ compound	: block
 		;
 
 unrecognized	: TOK_UNRECOGNIZED
-		{ errx(1, "UNRECOGNIZED TOKEN"); }
+		{ warnx("UNRECOGNIZED TOKEN"); }
 		;
 
 /******************************************************************************
@@ -479,20 +484,17 @@ undef		: TOK_UNDEF
 
 void yyerror(const char *msg)
 {
-	warnx("%s", msg);
 }
 
-void parse(const char *src, size_t len)
+bool parse(const char *src, size_t len)
 {
 	tokenizer_comments(false);
 
 	tokenizer_load(src, len);
 
-	yydebug = 1;
-
 	int rc = yyparse();
-	if (rc != 0)
-		warnx("PARSE FAILED");
 
 	tokenizer_unload();
+
+	return (rc == 0);
 }
