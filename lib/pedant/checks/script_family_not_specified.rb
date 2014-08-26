@@ -39,7 +39,8 @@ module Pedant
       tree = @kb[:trees][@kb[:main]]
 
       tree.all(:Call).each do |node|
-        next unless node.name.name == 'script_family'
+        next unless node.name.ident.name == 'script_family'
+        next unless node.name.indexes == []
         next if node.args.empty?
         next unless node.args.first.expr.is_a? Nasl::String
 

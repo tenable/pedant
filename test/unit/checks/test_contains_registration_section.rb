@@ -98,4 +98,20 @@ class TestContainsRegistrationSection < Test::Unit::TestCase
       %q|if (description) { exit(0, foo); }|
     )
   end
+
+  def test_indexed_description
+    check(
+      :fail,
+      :CheckContainsRegistrationSection,
+      %q|if (description["foo"]) { exit(0); }|
+    )
+  end
+
+  def test_indexed_exit
+    check(
+      :fail,
+      :CheckContainsRegistrationSection,
+      %q|if (description) { exit[foo](0); }|
+    )
+  end
 end

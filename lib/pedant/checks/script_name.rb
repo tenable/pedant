@@ -38,7 +38,8 @@ module Pedant
       tree = @kb[:trees][@kb[:main]]
 
       tree.all(:Call).each do |node|
-        next unless node.name.name == 'script_name'
+        next unless node.name.ident.name == 'script_name'
+        next unless node.name.indexes == []
         sn_nodes << node
       end
 

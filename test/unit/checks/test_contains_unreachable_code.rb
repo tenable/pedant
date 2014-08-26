@@ -90,4 +90,14 @@ class TestContainsUnreachableCode < Test::Unit::TestCase
       %q|{ continue; foo(); }|
     )
   end
+
+  # exit() is a special case in this check, because it's a function instead of a
+  # language keyword.
+  def test_indexed_exit
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      %q|{ exit.foo(); foo(); }|
+    )
+  end
 end

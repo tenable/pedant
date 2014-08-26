@@ -116,4 +116,12 @@ class TestScriptFamilyNotSpecified < Test::Unit::TestCase
       %q|script_family("foo bar");|
     )
   end
+
+  def test_indexed
+    check(
+      :fail,
+      :CheckScriptFamilyNotSpecified,
+      %q|script_family.foo("Windows");|
+    )
+  end
 end

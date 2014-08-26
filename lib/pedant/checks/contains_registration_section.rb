@@ -41,7 +41,7 @@ module Pedant
 
       # Find the registration If statement.
       regs = tree.all(:If).select do |node|
-        (node.cond.is_a?(Nasl::Lvalue) && node.cond.ident.name == 'description')
+        (node.cond.is_a?(Nasl::Lvalue) && node.cond.ident.name == 'description' && node.cond.indexes == [])
       end
 
       # Ensure there's a registration section.
@@ -82,8 +82,14 @@ module Pedant
         return fail
       end
 
-      unless statement.name.name == 'exit'
-        report(:error, "The registration section ends with a call to #{statement.name.name}, not exit as expected.")
+      unless statement.name.indexes == []
+        report(:error, "The registration section ends with a call to something other than exit.")
+        report(:error, statement.name.ident.context(reg))
+        return fail
+      end
+
+      unless statement.name.ident.name == 'exit'
+        report(:error, "The registration section ends with a call to #{statement.name.ident.name}, not exit as expected.")
         report(:error, statement.context(reg))
         return fail
       end

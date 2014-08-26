@@ -69,4 +69,12 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
       %q|script_set_attribute(attribute:"plugin_type", value:"foo");|
     )
   end
+
+  def test_indexed
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|script_set_attribute.foo(attribute:"plugin_type", value:"foo");|
+    )
+  end
 end
