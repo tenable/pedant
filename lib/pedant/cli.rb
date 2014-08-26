@@ -81,7 +81,7 @@ module Pedant
     end
 
     def self.usage(msg)
-      puts msg.color(:red)
+      puts Rainbow(msg).color(:red)
       puts
       puts @@optparse
       exit 1

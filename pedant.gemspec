@@ -22,6 +22,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rake'
 
-  s.add_runtime_dependency 'rainbow'
+  s.add_runtime_dependency 'rainbow', '>= 2.0.0'
   s.add_runtime_dependency 'nasl', '>= 0.0.7'
 end
