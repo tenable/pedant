@@ -8,10 +8,11 @@ Gem::Specification.new do |s|
   s.version     = Pedant::VERSION
   s.license     = 'BSD'
   s.homepage    = 'http://github.com/tenable/pedant'
-  s.summary     = 'A static analysis framework for the Nessus Attack Scripting Language.'
+  s.summary     = 'A framework for the Nessus Attack Scripting Language.'
+  s.description = 'A static analysis framework for the Nessus Attack Scripting Language.'
 
-  s.authors     = ['Mak Kolybabi']
-  s.email       = ['mak@kolybabi.com']
+  s.authors     = ['Mak Kolybabi', 'Alex Weber', 'Jacob Hammack']
+  s.email       = ['mak@kolybabi.com', 'aweber@tenable.com', 'jhammack@tenable.com']
 
   s.rubyforge_project = 'nasl-pedant'
 
@@ -20,8 +21,8 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ['lib']
 
-  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rake', '~> 0'
 
-  s.add_runtime_dependency 'rainbow', '>= 2.0.0'
-  s.add_runtime_dependency 'nasl', '>= 0.1.0'
+  s.add_runtime_dependency 'rainbow', '=2.0.0'
+  s.add_runtime_dependency 'nasl', '~> 0.1', '>= 0.1.1'
 end
