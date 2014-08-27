@@ -27,6 +27,7 @@
 require 'nasl'
 require 'pathname'
 require 'rainbow'
+require 'rainbow/ext/string'
 
 module Pedant
   def self.root
