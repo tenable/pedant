@@ -17,4 +17,16 @@ task :build => :compile do
   system "gem build pedant.gemspec"
 end
 
+task :tag_and_bag do
+	system "git tag -a v#{Pedant::VERSION} -m 'version #{Pedant::VERSION}'"
+	system "git push --tags"
+	system "git checkout master"
+	#system "git merge #{Pedant::VERSION}"
+	system "git push"
+end
+
+task :release => [:tag_and_bag, :build] do
+ 	system "gem push #{Pedant::APP_NAME}-#{Pedant::VERSION}.gem"
+end
+
 task :default => :compile
