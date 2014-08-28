@@ -84,7 +84,7 @@ module Pedant
 
       unless statement.name.indexes == []
         report(:error, "The registration section ends with a call to something other than exit.")
-        report(:error, statement.name.ident.context(reg))
+        report(:error, statement.context(reg))
         return fail
       end
 
