@@ -39,22 +39,30 @@ module Pedant
           if node.is_a?(Nasl::Break) || node.is_a?(Nasl::Continue) || node.is_a?(Nasl::Return) || (node.is_a?(Nasl::Call) && node.name.ident.name == 'exit' && node.name.indexes == [])
             # If this is not the final node in the list, then there is
             # absolutely no way for the later nodes to be accessed.
-            if node != list.last
-              report(:error, "#{file} contains unreachable code.")
-              return fail
-            end
+            return node if node != list.last
           end
         end
+        return nil
       end
 
       # Unreachable statements occur only when there are sequential lists of
       # instructions. In layers deeper than the outermost level of indentation,
       # this only occurs in Blocks.
-      tree.all(:Block).each { |blk| check_statements(file, blk.body) }
+      tree.all(:Block).each do |blk|
+        node = check_statements(file, blk.body)
+        if not node.nil?
+          fail
+          report(:error, node.context(blk))
+        end
+      end
 
       # The main body of a file is not a Block, so it must be considered
       # separately.
-      check_statements(file, tree)
+      node = check_statements(file, tree)
+      if not node.nil?
+        fail
+        report(:error, node.context(node))
+      end
     end
 
     def run
