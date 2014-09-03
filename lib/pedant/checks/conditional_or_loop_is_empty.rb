@@ -39,6 +39,7 @@ module Pedant
           fail
 
           report(:error, "#{cls} loop in #{file} has an empty statement as its body.")
+          report(:error, node.body.context(node))
         end
       end
 
@@ -55,6 +56,7 @@ module Pedant
           fail
 
           report(:error, "If statement in #{file} has an empty statement as #{name} branch.")
+          report(:error, branch.context(node))
         end
       end
     end
