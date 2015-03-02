@@ -51,6 +51,14 @@ class TestFlippedOperandsOnMatchOrSubstring < Test::Unit::TestCase
     )
   end
 
+  def test_simple_substring_indexed
+    check(
+      :pass,
+      :CheckFlippedOperandsOnMatchOrSubstring,
+      %q|if (a[i] >< 'woo') exit(0);|
+    )
+  end
+
   def test_simple_match
     check(
       :warn,

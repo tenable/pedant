@@ -24,16 +24,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-# This check is based on common usage of the regex and substring operators.
-# compat.inc, xcompat.inc, and xml_sax_parser.inc use the substring operator
-# in an uncommon but not incorrect way:
-#
-# tolower(xml[index]) >< "abcdefghijklmnopqrstuvwxyz:_"
-#
-# That is, checking if a particular character is within a certain subset,
-# without using a regex.
-# For this reason, this check only raises a warning and not a failure.
-
 module Pedant
   class CheckFlippedOperandsOnMatchOrSubstring < Check
     def self.requires
@@ -60,7 +50,13 @@ module Pedant
 
           return if side.nil?
 
-          if node.send(side).is_a?(Nasl::String) && node.send(opposite).is_a?(Nasl::Lvalue)
+          # The check for no indexes is to account for this uncommon-but-in-use
+          # pattern, to check that a character falls into a certain subset of
+          # acceptable characters:
+          #
+          #   tolower(xml[index]) >< "abcdefghijklmnopqrstuvwxyz:_"
+          #
+          if node.send(side).is_a?(Nasl::String) && node.send(opposite).is_a?(Nasl::Lvalue) && node.send(opposite).indexes == []
             warn
             report(:error, "A '#{node.op.body}' operator has a literal string on the #{if side == :lhs then 'left' else 'right' end}-hand side.")
             report(:error, "The operands may be accidentally swapped.")
