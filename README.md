@@ -9,8 +9,9 @@ If you have Ruby 1.9.3+ and Rubygems installed, you can simply do:
 Using
 -----
 To check a script, run this: `pedant check scriptname.nasl`.
+You can check `.inc` files the same way.
 
-To check an include, run this: `pedant check includename.inc`.
+See a `[WARN]` but there's no explanation of the problem? Try adding `-v`.
 
 Checking multiple files together is not currently supported (and has some
 semantics questions to be sorted out first). Currently, using xargs is the best
