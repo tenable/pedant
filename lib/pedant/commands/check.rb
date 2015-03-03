@@ -128,6 +128,7 @@ module Pedant
     end
 
     def self.run_one(opts, path)
+      puts Rainbow("CHECKING: #{path}").cyan
       # Get a list of the checks we're going to be running.
       if not opts[:checks].empty?
         pending = opts[:checks].to_a
@@ -170,6 +171,7 @@ module Pedant
       # dependencies or a fatal error occurring before they had the chance to
       # run.
       pending.each { |cls| puts cls.new(kb).report(opts[:verbosity]) }
+      puts
     end
   end
 end
