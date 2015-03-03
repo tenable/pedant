@@ -132,7 +132,7 @@ module Pedant
       if not opts[:checks].empty?
         pending = opts[:checks].to_a
       else
-        pending = Check.all
+        pending = Array.new(Check.all)
       end
 
       # Initialize the knowledge base where checks can store information for
