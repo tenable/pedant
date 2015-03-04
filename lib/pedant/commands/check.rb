@@ -140,31 +140,8 @@ module Pedant
       # other checks.
       kb = KnowledgeBase.new(:file_mode, path)
 
-      # Try to run each pending check, until we've run all our checks or
-      # deadlocked.
-      fatal = false
-      until pending.empty? || fatal
-        # Find all of the checks that can run right now.
-        ready = pending.select { |cls| cls.ready?(kb) }
-        break if ready.empty?
-
-        # Run all of the checks that are ready.
-        ready.each do |cls|
-          # Create a new check instance.
-          chk = cls.new(kb)
-          pending.delete(cls)
-
-          chk.run
-
-          # Fatal errors mean that no further checks should be processed.
-          if chk.result == :fatal
-            fatal = true
-            break
-          end
-
-          # Display the results of the check.
-          puts chk.report(opts[:verbosity])
-        end
+      Check.run_checks_in_dependency_order(kb, pending) do |chk|
+        puts chk.report(opts[:verbosity])
       end
 
       # Notify the user if any checks did not run due to unsatisfied

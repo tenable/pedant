@@ -51,10 +51,7 @@ module Pedant
 
       # Run all the dependencies for this check if we're in test mode.
       return unless @kb[:test_mode]
-      self.class.depends.each do |cls|
-        chk = cls.new(@kb)
-        chk.run
-      end
+      Check.run_checks_in_dependency_order(kb, self.class.depends)
     end
 
     def self.list
@@ -88,6 +85,35 @@ module Pedant
 
       Check.all.reject do |cls|
         (cls.provides & keys).empty?
+      end
+    end
+
+    def self.run_checks_in_dependency_order(kb, checks)
+      # Try to run each pending check, until we've run all our checks or
+      # deadlocked.
+      fatal = false
+      until checks.empty? || fatal
+        # Find all of the checks that can run right now.
+        ready = checks.select { |cls| cls.ready?(kb) }
+        break if ready.empty?
+
+        # Run all of the checks that are ready.
+        ready.each do |cls|
+          # Create a new check instance.
+          chk = cls.new(kb)
+          checks.delete(cls)
+
+          chk.run
+
+          # Yield the results of the finished check
+          yield chk if block_given?
+
+          # Fatal errors mean that no further checks should be processed.
+          if chk.result == :fatal
+            fatal = true
+            break
+          end
+        end
       end
     end
 
