@@ -77,7 +77,7 @@ module Pedant
             usage(e.message)
           end
 
-          options[:checks] << cls
+          ([cls] + cls.depends).each { |cls| options[:checks] << cls }
         end
 
         opts.on('-h', '--help', 'Display this help screen.') do

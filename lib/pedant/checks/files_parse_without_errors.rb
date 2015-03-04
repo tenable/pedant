@@ -30,7 +30,7 @@ module Pedant
       super + [:file_mode, :base, :main]
     end
 
-    def provides
+    def self.provides
       super + [:codes, :trees]
     end
 
