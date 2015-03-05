@@ -37,6 +37,16 @@ module Pedant
           # resuming where it left off (i.e., Call). The exception is exit(),
           # which is a builtin Function that terminates execution.
           if node.is_a?(Nasl::Break) || node.is_a?(Nasl::Continue) || node.is_a?(Nasl::Return) || (node.is_a?(Nasl::Call) && node.name.ident.name == 'exit' && node.name.indexes == [])
+
+            # We deprecate plugins by putting an exit() call before the
+            # 'descriptive section' so that it's never loaded by Nessus. These
+            # plugins have "@DEPRECATED@" in a comment at the top of them.
+            if node.is_a?(Nasl::Call) && node.name.ident.name == 'exit'
+              if @kb[:codes][file] =~ /^#\s*@DEPRECATED@$/
+                return nil
+              end
+            end
+
             # If this is not the final node in the list, then there is
             # absolutely no way for the later nodes to be accessed.
             return node if node != list.last

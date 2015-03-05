@@ -100,4 +100,34 @@ class TestContainsUnreachableCode < Test::Unit::TestCase
       %q|{ exit.foo(); foo(); }|
     )
   end
+
+  # We usually deprecate a script by adding an exit() at the top of the script,
+  # so that it's never loaded again. These plugins have an identifying comment
+  # at the top, "@DEPRECATED@".
+  def test_deprecated_plugin
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      <<EOF
+      # @DEPRECATED@
+      exit(0, "This has been deprecated");"
+EOF
+    )
+  end
+
+  # However, deprecated plugins don't get a free pass for other unreachable code!
+  def test_deprecated_plugin
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
+      <<EOF
+      # @DEPRECATED@
+      if (blah)
+      {
+        return "a";
+        return "b";
+      }
+EOF
+    )
+  end
 end
