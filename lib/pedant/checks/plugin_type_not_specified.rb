@@ -39,7 +39,7 @@ module Pedant
       tree = @kb[:trees][@kb[:main]]
 
       tree.all(:Call).each do |node|
-        next unless node.name.ident.name == 'script_set_attribute'
+        next unless ((node.name.ident.name == 'script_set_attribute') or (node.name.ident.name == "xscript_set_attribute"))
         next unless node.name.indexes == []
         next unless node.arg.has_key? 'attribute'
 

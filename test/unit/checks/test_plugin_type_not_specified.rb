@@ -77,8 +77,8 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
       %q|script_set_attribute.foo(attribute:"plugin_type", value:"foo");|
     )
   end
-####
- def nbin_test_one
+ 
+  def test_nbin_one
     check(
       :pass,
       :CheckPluginTypeNotSpecified,
@@ -86,7 +86,7 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
     )
   end
 
-  def nbin_test_many
+  def test_nbin_many
     check(
       :fail,
       :CheckPluginTypeNotSpecified,
@@ -95,7 +95,7 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
     )
   end
 
-  def nbin_test_valid
+  def test_nbin_valid
     ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].each do |type|
       check(
         :pass,
@@ -105,7 +105,7 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
     end
   end
 
-  def nbin_test_invalid
+  def test_nbin_invalid
     check(
       :fail,
       :CheckPluginTypeNotSpecified,
@@ -113,7 +113,7 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
     )
   end
 
-  def nbin_test_indexed
+  def test_nbin_indexed
     check(
       :fail,
       :CheckPluginTypeNotSpecified,
