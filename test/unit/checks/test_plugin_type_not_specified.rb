@@ -77,4 +77,47 @@ class TestPluginTypeNotSpecified < Test::Unit::TestCase
       %q|script_set_attribute.foo(attribute:"plugin_type", value:"foo");|
     )
   end
+####
+ def nbin_test_one
+    check(
+      :pass,
+      :CheckPluginTypeNotSpecified,
+      %q|xscript_set_attribute(attribute:"plugin_type", value:"local");|
+    )
+  end
+
+  def nbin_test_many
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|xscript_set_attribute(attribute:"plugin_type", value:"local");| +
+      %q|xscript_set_attribute(attribute:"plugin_type", value:"remote");|
+    )
+  end
+
+  def nbin_test_valid
+    ['combined', 'local', 'reputation', 'remote', 'settings', 'thirdparty'].each do |type|
+      check(
+        :pass,
+        :CheckPluginTypeNotSpecified,
+        %Q|xscript_set_attribute(attribute:"plugin_type", value:"#{type}");|
+      )
+    end
+  end
+
+  def nbin_test_invalid
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|xscript_set_attribute(attribute:"plugin_type", value:"foo");|
+    )
+  end
+
+  def nbin_test_indexed
+    check(
+      :fail,
+      :CheckPluginTypeNotSpecified,
+      %q|xscript_set_attribute.foo(attribute:"plugin_type", value:"foo");|
+    )
+  end
 end
