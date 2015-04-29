@@ -92,6 +92,7 @@ module Pedant
       # Try to run each pending check, until we've run all our checks or
       # deadlocked.
       fatal = false
+      run_checks = []
       until checks.empty? || fatal
         # Find all of the checks that can run right now.
         ready = checks.select { |cls| cls.ready?(kb) }
@@ -106,7 +107,7 @@ module Pedant
           chk.run
 
           # Yield the results of the finished check
-          yield chk if block_given?
+          run_checks << chk
 
           # Fatal errors mean that no further checks should be processed.
           if chk.result == :fatal
@@ -115,6 +116,7 @@ module Pedant
           end
         end
       end
+      run_checks
     end
 
     def report(level, text=nil)

@@ -89,6 +89,10 @@ module Pedant
           puts Check.list
           exit 0
         end
+
+        opts.on('-q', '--quiet', "Only speak up when something should be fixed.") do
+          options[:quiet] = true
+        end
       end
 
       # Load all of the checks.
@@ -128,7 +132,6 @@ module Pedant
     end
 
     def self.run_one(opts, path)
-      puts Rainbow("CHECKING: #{path}").cyan
       # Get a list of the checks we're going to be running.
       if not opts[:checks].empty?
         pending = opts[:checks].to_a
@@ -140,10 +143,15 @@ module Pedant
       # other checks.
       kb = KnowledgeBase.new(:file_mode, path)
 
-      Check.run_checks_in_dependency_order(kb, pending) do |chk|
+      run_checks = Check.run_checks_in_dependency_order(kb, pending)
+      # When in quiet mode, only make a report for this file if a check did not pass
+      return if opts[:quiet] && run_checks.all? { |chk| [:skip, :pass].include? chk.result }
+
+      puts Rainbow("CHECKING: #{path}").cyan
+      run_checks.each do |chk|
+        next if [:skip, :pass].include?(chk.result) && opts[:quiet]
         puts chk.report(opts[:verbosity])
       end
-
       # Notify the user if any checks did not run due to unsatisfied
       # dependencies or a fatal error occurring before they had the chance to
       # run.
