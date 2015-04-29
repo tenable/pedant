@@ -147,7 +147,11 @@ module Pedant
       # Notify the user if any checks did not run due to unsatisfied
       # dependencies or a fatal error occurring before they had the chance to
       # run.
-      pending.each { |cls| puts cls.new(kb).report(opts[:verbosity]) }
+      pending.each do |cls|
+        # Special case. This check is a shim to set things up for unit tests.
+        next if cls == CheckParseTestCode
+        puts cls.new(kb).report(opts[:verbosity])
+      end
       puts
     end
   end
