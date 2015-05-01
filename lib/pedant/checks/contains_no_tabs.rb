@@ -24,6 +24,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
+require 'rainbow'
+
 module Pedant
   class CheckContainsNoTabs < Check
     def self.requires
@@ -31,9 +33,19 @@ module Pedant
     end
 
     def check(file, code)
-      return unless code =~ /\t/
+      tab_lines = Hash.new
+      code.split("\n").each_with_index do |line, linenum|
+        tab_lines[linenum + 1] = line if line =~ /\t/
+      end
 
-      report(:warn, "Tabs were found in #{file}.")
+      return if tab_lines.length == 0
+
+      report(:warn, "Tabs were found in #{file}, on these lines: #{tab_lines.keys.sort.join(', ')}")
+      report(:warn, "Showing up to five lines:")
+      tab_lines.keys.sort.first(5).each do |linenum|
+        report(:warn, "#{linenum}: #{tab_lines[linenum].gsub(/\t/, Rainbow("    ").background(:red))}")
+      end
+
       warn
     end
 
