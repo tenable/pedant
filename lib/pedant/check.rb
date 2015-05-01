@@ -29,12 +29,12 @@ module Pedant
     attr_reader :result
 
     @@statuses = {
-      :died => Rainbow('DIED').color(:red),
-      :fail => Rainbow('FAIL').color(:red),
-      :pass => Rainbow('PASS').color(:green),
-      :skip => Rainbow('SKIP').color(:green),
-      :warn => Rainbow('WARN').color(:yellow),
-      :void => Rainbow('VOID').color(:magenta)
+      :fatal => Rainbow('DIED').color(:red),
+      :fail  => Rainbow('FAIL').color(:red),
+      :pass  => Rainbow('PASS').color(:green),
+      :skip  => Rainbow('SKIP').color(:green),
+      :warn  => Rainbow('WARN').color(:yellow),
+      :void  => Rainbow('VOID').color(:magenta)
     }
 
     @@levels = [:error, :warn, :info]
@@ -153,7 +153,7 @@ module Pedant
 
     def fatal
       report(:error, "This is a fatal error.")
-      @result = :died
+      @result = :fatal
     end
 
     def pass
