@@ -54,7 +54,7 @@ module Pedant
           @kb[:codes][file] = contents
           report(:info, "Read contents of #{path}.")
         rescue
-          report(:error, "Failed to read contents #{path}.")
+          report(:error, "Failed to read contents of #{path}.")
           return fatal
         end
 
