@@ -87,9 +87,9 @@ module Pedant
       return if confusable_name_groups.length == 0
 
       warn
-      report(:error, "These sets of names differ only by capitalization or underscores:")
+      report(:warn, "These sets of names differ only by capitalization or underscores:")
       confusable_name_groups.each do |names|
-        report(:error, "  #{names.join(', ')}")
+        report(:warn, "  #{names.join(', ')}")
       end
     end
 
