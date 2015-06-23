@@ -50,6 +50,7 @@ module Pedant
         # Ensure that the script family is valid.
         unless [
           "AIX Local Security Checks",
+          "Amazon Linux Local Security Checks",
           "Backdoors",
           "Brute force attacks",
           "CentOS Local Security Checks",
@@ -61,6 +62,7 @@ module Pedant
           "Default Unix Accounts",
           "Denial of Service",
           "DNS",
+          "F5 Networks Local Security Checks",
           "Fedora Local Security Checks",
           #"Finger abuses", # removed december 2011
           "Firewalls",
@@ -70,12 +72,16 @@ module Pedant
           "General",
           "Gentoo Local Security Checks",
           "HP-UX Local Security Checks",
+          "Huawei Local Security Checks",
           "Junos Local Security Checks",
           "MacOS X Local Security Checks",
           "Mandriva Local Security Checks",
           "Misc.",
           "Mobile Devices",
           "Netware",
+          "Oracle Linux Local Security Checks",
+          "OracleVM Local Security Checks",
+          "Palo Alto Local Security Checks",
           "Peer-To-Peer File Sharing",
           "Policy Compliance",
           "Port scanners",
