@@ -32,6 +32,7 @@ module Pedant
 
     def check(file, tree)
       tree.all(:Integer).select { |i| i.tokens.first.type == :INT_OCT }.each do |i|
+        next if i.value == 0 # Lots of plugins use '00' or '0000', which is ok.
         warn
         report(:warn, "NASL integers with all digits between 0-7 and starting with '0' are considered octal.")
         report(:warn, "This integer will have decimal value '#{i.value}'.")
