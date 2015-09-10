@@ -43,6 +43,22 @@ class TestUsesOctalIntegers < Test::Unit::TestCase
     )
   end
 
+  def test_octal_all_zeroes_short
+    check(
+      :pass,
+      :CheckUsesOctalIntegers,
+      %q|if (a = 00) { exit(); }|
+    )
+  end
+
+  def test_octal_all_zeroes_longer
+    check(
+      :pass,
+      :CheckUsesOctalIntegers,
+      %q|if (a = 000000) { exit(); }|
+    )
+  end
+
   def test_decimal_literal
     check(
       :pass,
