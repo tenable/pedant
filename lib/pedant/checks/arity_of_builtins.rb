@@ -82,8 +82,6 @@ module Pedant
           report(:error, call.args[0].context(call))
         elsif call.args.length > 1
           report(:error, call.args[1].context(call))
-        else
-          raise "hello"
         end
       end
     end
