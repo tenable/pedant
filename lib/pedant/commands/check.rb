@@ -93,6 +93,10 @@ module Pedant
         opts.on('-q', '--quiet', "Only speak up when something should be fixed.") do
           options[:quiet] = true
         end
+
+        opts.on('-v', '--verbose', 'Output more information, use multiple time to increase verbosity.') do
+          options[:verbosity] += 1
+        end
       end
 
       # Load all of the checks.

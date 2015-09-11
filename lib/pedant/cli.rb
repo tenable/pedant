@@ -45,10 +45,6 @@ module Pedant
         opts.separator ""
         opts.separator "Global settings:"
 
-        opts.on('-v', '--verbose', 'Output more information, use multiple time to increase verbosity.') do
-          options[:verbosity] += 1
-        end
-
         opts.separator ""
         opts.separator "Common operations:"
 
