@@ -43,6 +43,14 @@ class TestUsesOctalIntegers < Test::Unit::TestCase
     )
   end
 
+  def test_nearly_octal_integer
+    check(
+      :warn,
+      :CheckUsesOctalIntegers,
+      %q|if (a = 099) { exit(); }|
+    )
+  end
+
   def test_octal_all_zeroes_short
     check(
       :pass,

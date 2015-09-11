@@ -34,8 +34,18 @@ module Pedant
       tree.all(:Integer).select { |i| i.tokens.first.type == :INT_OCT }.each do |i|
         next if i.value == 0 # Lots of plugins use '00' or '0000', which is ok.
         warn
-        report(:warn, "NASL integers with all digits between 0-7 and starting with '0' are considered octal.")
+        report(:warn, "NASL integers beginning with '0' with all digits between 0-7 are octal.")
         report(:warn, "This integer will have decimal value '#{i.value}'.")
+        report(:warn, i.context(i))
+      end
+
+      tree.all(:Integer).select { |i| i.tokens.first.type == :INT_DEC }.each do |i|
+        next if i.value == 0 # Lots of plugins use '00' or '0000', which is ok.
+        next if not i.tokens.first.body =~ /^0[0-9]/
+        warn
+        report(:warn, "This integer appears to be octal, but will be interpreted as decimal.")
+        report(:warn, "NASL integers beginning with '0' with all digits between 0-7 are octal.")
+        report(:warn, "Remove the leading '0' to make it clear this integer should be decimal.")
         report(:warn, i.context(i))
       end
     end
