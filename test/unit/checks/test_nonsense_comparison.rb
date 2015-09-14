@@ -59,7 +59,7 @@ class TestNonsenseComparison < Test::Unit::TestCase
     )
   end
 
-  def test_isnull_literal_string
+  def test_isnull_literal_integer
     check(
       :fail,
       :CheckNonsenseComparison,
