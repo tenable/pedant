@@ -13,6 +13,32 @@ To check a script, run this: `pedant check scriptname.nasl`.  You can check
 
 See a `[WARN]` but there's no explanation of the problem? Try adding `-v`.
 
+Development
+-----------
+
+This project uses [Bundler](http://bundler.io/).
+
+If you have a brand-new Debian machine, do this as root:
+
+    apt-get install ruby-dev rubygems git
+    gem install bundler
+
+As your regular user:
+
+    git clone https://github.com/tenable/pedant
+    cd pedant
+    bundle install --path vendor/bundle
+    bundle exec rake tests
+
+All the tests should pass!
+
+To run the Pedant command line, do `bundle exec ./bin/pedant`, which should give
+a help message.
+
+If you get an error like this, try prefixing your command with `bundle exec`:
+
+    /usr/lib/ruby/2.x.x/rubygems/core_ext/kernel_require.rb:NN:in `require': cannot load such file -- libname (LoadError)
+
 Bugs
 ----
 
