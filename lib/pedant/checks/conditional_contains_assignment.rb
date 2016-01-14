@@ -32,7 +32,7 @@ module Pedant
 
     def check(file, tree)
       def walk(node, root)
-        # Assignments of literals are the most likely to be bugs (determined empiracally).
+        # Assignments of literals are the most likely to be bugs (determined empirically).
         literals = [
           Nasl::String,
           Nasl::Integer,
