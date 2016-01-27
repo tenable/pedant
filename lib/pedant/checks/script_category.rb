@@ -85,6 +85,7 @@ module Pedant
         "ACT_GATHER_INFO",
         "ACT_ATTACK",
         "ACT_MIXED",
+        "ACT_MIXED_ATTACK",
         "ACT_DESTRUCTIVE_ATTACK",
         "ACT_COMPLIANCE_CHECK",
         "ACT_PATCH_SETUP",
