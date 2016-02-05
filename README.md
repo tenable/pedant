@@ -1,6 +1,9 @@
 Pedant, a static analysis tool for NASL
 =======================================
 
+[![Gem Version](http://img.shields.io/gem/v/nasl-pedant.svg?style=flat-square)](https://rubygems.org/gems/nasl-pedant)
+
+
 Installing
 ----------
 If you have Ruby 1.9.3+ and Rubygems installed, you can simply do:
