@@ -58,6 +58,13 @@ module Pedant
           exit 1
         end
 
+        opts.on('-v') do
+          puts "The -v argument now comes after the `check` subcommand. Like so:"
+          puts "  pedant check -v file.nasl"
+          puts "For the version, do -V or --version."
+          exit 1
+        end
+
         opts.on('-V', '--version', 'Display the version of Pedant.') do
           puts "#{Pedant::VERSION}"
           exit
