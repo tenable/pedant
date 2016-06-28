@@ -38,8 +38,8 @@ module Pedant
       codes = @kb[:codes][@kb[:main]]
 
       tree.all(:Call).each do |node|
-	next unless [
-	  "get_kb_item",
+        next unless [
+          "get_kb_item",
           "rm_kb_item",
           "get_kb_list",
           "replace_kb_item",
@@ -50,16 +50,16 @@ module Pedant
           "get_fresh_kb_item",
           "get_global_kb_list",
           "get_kb_item_or_exit"
-	].include? node.name.ident.name
+        ].include? node.name.ident.name
       	next if node.args.empty?
 
         # one case where we check all arguments
         if node.name.ident.name == "script_require_keys"
-	  node.args.each { |arg|
+          node.args.each { |arg|
             arg = arg.expr
             next unless arg.text.index("Secret") == 0
             next if codes.index("#TRUSTED") == 0
-	    report(
+            report(
               :warn,
               "Plugin is accessing the secret KB item #{arg.text} and needs to be signed."
             )
@@ -68,11 +68,11 @@ module Pedant
         end
 
         # every other function we need to check the first argument, or if the arguments are named, the 'name' argument
-	arg = node.args.first.expr
-	if node.args.first.name.respond_to? :name
-	  arg = node.args[1].expr if node.args[1].name.name == "name"
+        arg = node.args.first.expr
+        if node.args.first.name.respond_to? :name
+          arg = node.args[1].expr if node.args[1].name.name == "name"
         end
-  
+
         if arg.text.index("Secret") == 0
           next if codes.index("#TRUSTED") == 0
           report(
