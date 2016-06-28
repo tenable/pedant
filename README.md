@@ -31,7 +31,7 @@ As your regular user:
     git clone https://github.com/tenable/pedant
     cd pedant
     bundle install --path vendor/bundle
-    bundle exec rake tests
+    bundle exec rake test
 
 All the tests should pass!
 
