@@ -38,9 +38,7 @@ module Pedant
     end
 
     def check(file, tree)
-      def find_open_call(node)
-        found = Set.new
-        node.each do |bnode|
+              def node_parser(bnode, found)
           if bnode.is_a?(Nasl::Call)
             if (bnode.name.ident.name == "open_sock_tcp")
               found.add("")
@@ -84,19 +82,40 @@ module Pedant
             if bnode.expr.is_a?(Nasl::Lvalue)
                 found = found - [bnode.expr.ident.name]
             end
+          elsif bnode.is_a?(Nasl::If)
+            # the if statement provides us with a block we can peak down to.
+            # However, it isn't always enumerable so handle accordingly
+            if (bnode.true.is_a?(Enumerable))
+              found = block_parser(bnode.true, found)
+            else
+              found = node_parser(bnode.true, found);
+            end
+            if (bnode.false.is_a?(Enumerable))
+              found = block_parser(bnode.false, found)
+            else
+              found = node_parser(bnode.false, found);
+            end
           end
+          return found
         end
-        return found
+
+      def block_parser(node, found)
+        node.each do |bnode|
+          found = node_parser(bnode, found);
+        end
+        return found;
       end
 
+      # Extract by the block. Will help us since we don't dive down into all
+      # blocks as of yet (only if statements)
       allFound = Set.new
       tree.all(:Block).each do |node|
-        allFound.merge(find_open_call(node.body))
+        allFound.merge(block_parser(node.body, Set.new))
       end
       
       # The main body of a file is not a Block, so it must be considered
       # separately.
-      allFound.merge(find_open_call(tree))
+      allFound.merge(block_parser(tree, Set.new))
 
       if allFound.size() > 0
         warn

@@ -92,13 +92,20 @@ class TestSockLeak < Test::Unit::TestCase
     )
   end
 
-  # This is an example of what this parser can't handle.
-  #def test_local_var_close_wrong_handle
-  #  check(
-  #    :pass,
-  #    :CheckSocketLeak,
-  #    %q|local_var soc = open_sock_tcp(8080); if (soc) close(soc); exit(0);|
-  #  )
-  #end
+  def test_local_if_close
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|local_var soc = open_sock_tcp(8080); if (soc) close(soc); exit(0);|
+    )
+  end
+
+  def test_block_if_close
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|local_var soc = open_sock_tcp(8080); if (soc) { local_var test = 0; close(soc); } exit(0);|
+    )
+  end
 
 end
