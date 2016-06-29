@@ -115,7 +115,7 @@ module Pedant
                                           bnode.name.ident.name == "audit")))
             report_findings(found)
           elsif bnode.is_a?(Nasl::If)
-            if (bnode.cond.is_a?(Nasl::Expression))
+            if (bnode.cond.is_a?(Nasl::Expression) and bnode.cond.rhs.is_a?(Nasl::Lvalue))
               if bnode.cond.op.to_s() == "!"
                 if found.any? {|varName| varName == bnode.cond.rhs.ident.name}
                   # don't go down this path. This is the !soc path
