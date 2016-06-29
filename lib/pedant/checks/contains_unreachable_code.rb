@@ -36,7 +36,10 @@ module Pedant
           # Check if the Node is capable of jumping out of the Block, without
           # resuming where it left off (i.e., Call). The exception is exit(),
           # which is a builtin Function that terminates execution.
-          if node.is_a?(Nasl::Break) || node.is_a?(Nasl::Continue) || node.is_a?(Nasl::Return) || (node.is_a?(Nasl::Call) && node.name.ident.name == 'exit' && node.name.indexes == [])
+          if node.is_a?(Nasl::Break) || node.is_a?(Nasl::Continue) ||
+             node.is_a?(Nasl::Return) || (node.is_a?(Nasl::Call) &&
+             (node.name.ident.name == 'exit' ||
+              node.name.ident.name == 'audit') && node.name.indexes == [])
             # If this is not the final node in the list, then there is
             # absolutely no way for the later nodes to be accessed.
             return node if node != list.last

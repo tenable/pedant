@@ -43,6 +43,12 @@ class TestContainsUnreachableCode < Test::Unit::TestCase
     check(
       :fail,
       :CheckContainsUnreachableCode,
+      %q|audit(); foo();|
+    )
+
+    check(
+      :fail,
+      :CheckContainsUnreachableCode,
       %q|return; foo();|
     )
 
@@ -98,6 +104,14 @@ class TestContainsUnreachableCode < Test::Unit::TestCase
       :pass,
       :CheckContainsUnreachableCode,
       %q|{ exit.foo(); foo(); }|
+    )
+  end
+  
+  def audit_indexed_exit
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      %q|{ audit.foo(); foo(); }|
     )
   end
 end
