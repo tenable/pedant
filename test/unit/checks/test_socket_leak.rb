@@ -140,4 +140,19 @@ class TestSockLeak < Test::Unit::TestCase
     )
   end
 
+  def ignore_smb
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|{ soc = http_open_socket(8080); session_init(0); };|
+    )
+  end
+  
+  def ignore_ssh
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|{ soc = open_sock_tcp(8080); ssh_close_connection(); };|
+    )
+  end
 end

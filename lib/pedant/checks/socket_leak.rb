@@ -45,7 +45,8 @@ module Pedant
     def check(file, tree)
       ##
       # Examines a single passed in node and tries to appropriately handle it
-      # based on the type.
+      # based on the type. This function ignores "g_sock" and _ssh_socket as both
+      # of these are handled in a way that this parser can't really handle
       #
       # @param bnode the node to examine
       # @param found a set of active "open_sock_tcp" items
@@ -66,6 +67,9 @@ module Pedant
               if bnode.args[0].expr.is_a?(Nasl::Lvalue)
                 found = found - [bnode.args[0].expr.ident.name]
               end
+            elsif (bnode.name.ident.name == "session_init" ||
+                   bnode.name.ident.name == "ssh_close_connection")
+              pass
             end
           elsif bnode.is_a?(Nasl::Assignment)
             name = ""
@@ -73,8 +77,9 @@ module Pedant
               name = bnode.lval.ident.name;
             end
             if bnode.expr.is_a?(Nasl::Call)
-              if (bnode.expr.name.ident.name == "open_sock_tcp" ||
-                  bnode.expr.name.ident.name == "http_open_socket")
+              if ((bnode.expr.name.ident.name == "open_sock_tcp" ||
+                  bnode.expr.name.ident.name == "http_open_socket") &&
+                  name != "g_sock" && name != "_ssh_socket")
                 found.add(name)
               end
             end
@@ -88,8 +93,9 @@ module Pedant
                   name = idents.lval.name
                 end
                 if idents.expr.is_a?(Nasl::Call)
-                  if (idents.expr.name.ident.name == "open_sock_tcp" ||
-                      idents.expr.name.ident.name == "http_open_socket")
+                  if ((idents.expr.name.ident.name == "open_sock_tcp" ||
+                      idents.expr.name.ident.name == "http_open_socket")  &&
+                      name != "g_sock" && name != "_ssh_socket")
                     found.add(name)
                   end
                 end
