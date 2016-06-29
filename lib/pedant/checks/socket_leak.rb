@@ -43,6 +43,27 @@ module Pedant
     # @param tree the entire file tree
     ##
     def check(file, tree)
+
+      ##
+      # If the allFound contains anything then throw up a warning
+      ##
+      def report_findings(allFound)
+        if allFound.size() > 0
+          warn
+          output = ""
+          allFound.each do |handle|
+            if !output.empty?
+              output += ", "
+            end
+            if handle == ""
+              handle = "<unassigned>"
+            end
+            output += handle
+          end
+          report(:warn, "Possibly leaked socket handle(s): " + output)
+        end
+      end
+ 
       ##
       # Examines a single passed in node and tries to appropriately handle it
       # based on the type. This function ignores "g_sock" and _ssh_socket as both
@@ -53,25 +74,7 @@ module Pedant
       # @return the new list of open_sock_tcp items
       ##
       def node_parser(bnode, found)
-          if bnode.is_a?(Nasl::Call)
-            if (bnode.name.ident.name == "open_sock_tcp" ||
-                bnode.name.ident.name == "http_open_socket")
-              found.add("")
-            elsif (bnode.name.ident.name == "close" ||
-                   bnode.name.ident.name == "ftp_close" ||
-                   bnode.name.ident.name == "http_close_socket" ||
-                   bnode.name.ident.name == "smtp_close")
-              # Check that this is an Lvalue. It could be a call or something
-              # which is just too complicated to handle and doesn't really work
-              # with our variable tracking system
-              if bnode.args[0].expr.is_a?(Nasl::Lvalue)
-                found = found - [bnode.args[0].expr.ident.name]
-              end
-            elsif (bnode.name.ident.name == "session_init" ||
-                   bnode.name.ident.name == "ssh_close_connection")
-              pass
-            end
-          elsif bnode.is_a?(Nasl::Assignment)
+          if bnode.is_a?(Nasl::Assignment)
             name = ""
             if bnode.lval.is_a?(Nasl::Lvalue)
               name = bnode.lval.ident.name;
@@ -107,7 +110,19 @@ module Pedant
             if bnode.expr.is_a?(Nasl::Lvalue)
                 found = found - [bnode.expr.ident.name]
             end
+          elsif (bnode.is_a?(Nasl::Break) || bnode.is_a?(Nasl::Continue) ||
+              (bnode.is_a?(Nasl::Call) && (bnode.name.ident.name == "exit" ||
+                                          bnode.name.ident.name == "audit")))
+            report_findings(found)
           elsif bnode.is_a?(Nasl::If)
+            if (bnode.cond.is_a?(Nasl::Expression))
+              if bnode.cond.op.to_s() == "!"
+                if found.any? {|varName| varName == bnode.cond.rhs.ident.name}
+                  # don't go down this path. This is the !soc path
+                  return found;
+                end
+              end
+            end
             # the if statement provides us with a block we can peak down to.
             # However, it isn't always enumerable so handle accordingly
             if (bnode.true.is_a?(Enumerable))
@@ -122,6 +137,24 @@ module Pedant
             end
           elsif bnode.is_a?(Nasl::Block)
             found = block_parser(bnode.body, found);
+          elsif bnode.is_a?(Nasl::Call)
+            if (bnode.name.ident.name == "open_sock_tcp" ||
+                bnode.name.ident.name == "http_open_socket")
+              found.add("")
+            elsif (bnode.name.ident.name == "close" ||
+                   bnode.name.ident.name == "ftp_close" ||
+                   bnode.name.ident.name == "http_close_socket" ||
+                   bnode.name.ident.name == "smtp_close")
+              # Check that this is an Lvalue. It could be a call or something
+              # which is just too complicated to handle and doesn't really work
+              # with our variable tracking system
+              if bnode.args[0].expr.is_a?(Nasl::Lvalue)
+                found = found - [bnode.args[0].expr.ident.name]
+              end
+            elsif (bnode.name.ident.name == "session_init" ||
+                   bnode.name.ident.name == "ssh_close_connection")
+              pass
+            end
           end
           return found
         end
@@ -138,7 +171,7 @@ module Pedant
         end
         return found;
       end
-
+      
       # Extract by the block. Will help us since we don't dive down into all
       # blocks as of yet (only if statements)
       allFound = Set.new
@@ -149,21 +182,7 @@ module Pedant
       # The main body of a file is not a Block, so it must be considered
       # separately.
       allFound.merge(block_parser(tree, Set.new))
-
-      if allFound.size() > 0
-        warn
-        output = ""
-        allFound.each do |handle|
-          if !output.empty?
-            output += ", "
-          end
-          if handle == ""
-            handle = "<unassigned>"
-          end
-          output += handle
-        end
-        report(:warn, "Possibly leaked socket handle(s): " + output)
-      end
+      report_findings(allFound)
     end
 
     def run

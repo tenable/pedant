@@ -155,4 +155,20 @@ class TestSockLeak < Test::Unit::TestCase
       %q|{ soc = open_sock_tcp(8080); ssh_close_connection(); };|
     )
   end
+
+  def test_ignore_soc_check
+    check(
+      :warn,
+      :CheckSocketLeak,
+      %q|{ soc = http_open_socket(8080); if (!soc) close(soc); exit(0); };|
+    )
+  end
+
+  def test_check_early_exit
+    check(
+      :warn,
+      :CheckSocketLeak,
+      %q|{ soc = open_sock_tcp(8080); if(test()) exit(1); close(soc); };|
+    )
+  end
 end
