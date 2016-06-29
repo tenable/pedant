@@ -83,6 +83,15 @@ class TestSockLeak < Test::Unit::TestCase
     )
   end
   
+  # To avoid false positives the check won't mark returned sockets as leaks
+  def test_created_socket_returned
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|soc = open_sock_tcp(8080); return soc;|
+    )
+  end
+
   # This is an example of what this parser can't handle.
   #def test_local_var_close_wrong_handle
   #  check(

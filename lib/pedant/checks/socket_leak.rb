@@ -78,11 +78,17 @@ module Pedant
                 end
               end
             end
+          elsif bnode.is_a?(Nasl::Return)
+            # if the socket we are tracking gets returned then never mark it as
+            # a leak
+            if bnode.expr.is_a?(Nasl::Lvalue)
+                found = found - [bnode.expr.ident.name]
+            end
           end
         end
         return found
       end
-      
+
       allFound = Set.new
       tree.all(:Block).each do |node|
         allFound.merge(find_open_call(node.body))
