@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2016, Andrew Orr
+# Copyright (c) 2016, Tenable Network Security
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,8 @@ module Pedant
         if node.name.ident.name == "script_require_keys"
           node.args.each { |arg|
             arg = arg.expr
+            arg = arg.lhs while arg.is_a? Nasl::Expression
+            next unless arg.respond_to? :text
             next unless arg.text.index("Secret") == 0
             next if codes.index("#TRUSTED") == 0
             report(
@@ -69,9 +71,12 @@ module Pedant
 
         # every other function we need to check the first argument, or if the arguments are named, the 'name' argument
         arg = node.args.first.expr
-        if node.args.first.name.respond_to? :name
-          arg = node.args[1].expr if node.args[1].name.name == "name"
+        if node.args.first.respond_to? :name and node.args.first.name.respond_to? :name
+          arg = node.args[1].expr if node.args[1].respond_to? :name and node.args[1].name.respond_to? :name and node.args[1].name.name == "name"
         end
+
+	arg = arg.lhs while arg.is_a? Nasl::Expression
+        next unless arg.respond_to? :text
 
         if arg.text.index("Secret") == 0
           next if codes.index("#TRUSTED") == 0

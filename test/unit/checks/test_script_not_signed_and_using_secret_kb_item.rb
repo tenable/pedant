@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2016, Andrew Orr
+# Copyright (c) 2016, Tenable Network Security
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -228,6 +228,23 @@ class TestScriptNotSignedAndUsingSecretKBItem < Test::Unit::TestCase
       :fail,
       :CheckScriptNotSignedAndUsingSecretKBItem,
       %q|set_kb_item(value:20, name:"Secret/SSH/Username");|
+    )
+  end
+
+  def test_get_kb_item_name_expr_signed
+    check(
+      :pass,
+      :CheckScriptNotSignedAndUsingSecretKBItem,
+      %q|#TRUSTED blah| +
+      %q|get_kb_item(name:"Secret/"+var+"lol");|
+    )
+  end
+
+  def test_get_kb_item_name_expr_not_signed
+    check(
+      :fail,
+      :CheckScriptNotSignedAndUsingSecretKBItem,
+      %q|get_kb_item(name:"Secret/"+var+"lol");|
     )
   end
 
