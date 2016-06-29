@@ -24,13 +24,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-##
-# This module can identify simple socket leaks (socket was opened
-# but never closed). Unfortunately, this implementation only works
-# in immediate block scope (ie doesn't search up a block or down
-# a block for the close). As such, false positives/negatives can
-# occur. Which is why this uses the "warning" report
-##
 module Pedant
   class CheckSocketLeak < Check
     def self.requires
