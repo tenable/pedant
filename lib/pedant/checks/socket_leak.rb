@@ -37,8 +37,21 @@ module Pedant
       super + [:trees]
     end
 
+    ##
+    # Breaks the tree up into blocks and feeds them into block_parser
+    # @param file the current file being examined
+    # @param tree the entire file tree
+    ##
     def check(file, tree)
-              def node_parser(bnode, found)
+      ##
+      # Examines a single passed in node and tries to appropriately handle it
+      # based on the type.
+      #
+      # @param bnode the node to examine
+      # @param found a set of active "open_sock_tcp" items
+      # @return the new list of open_sock_tcp items
+      ##
+      def node_parser(bnode, found)
           if bnode.is_a?(Nasl::Call)
             if (bnode.name.ident.name == "open_sock_tcp")
               found.add("")
@@ -99,9 +112,15 @@ module Pedant
           return found
         end
 
-      def block_parser(node, found)
-        node.each do |bnode|
-          found = node_parser(bnode, found);
+      ##
+      # Iterates over the blocks and hands individual nodes up to the node_parser
+      # @param block the current Block node to examine
+      # @param found the current list of found open_sock_tcp
+      # @param all the found open_sock_tcp that haven't been closed
+      ##
+      def block_parser(block, found)
+        block.each do |node|
+          found = node_parser(node, found);
         end
         return found;
       end
