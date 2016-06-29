@@ -108,4 +108,36 @@ class TestSockLeak < Test::Unit::TestCase
     )
   end
 
+  def test_ftp_close
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|{ soc = open_sock_tcp(8080); ftp_close(soc); exit(0); };|
+    )
+  end
+  
+  def test_smtp_close
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|{ soc = open_sock_tcp(8080); smtp_close(soc); exit(0); };|
+    )
+  end
+  
+  def test_http_open_close
+    check(
+      :pass,
+      :CheckSocketLeak,
+      %q|{ soc = http_open_socket(8080); http_close_socket(soc); exit(0); };|
+    )
+  end
+  
+  def test_http_leak
+    check(
+      :warn,
+      :CheckSocketLeak,
+      %q|{ soc = http_open_socket(8080); exit(0); };|
+    )
+  end
+
 end

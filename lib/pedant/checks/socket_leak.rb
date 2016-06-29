@@ -38,7 +38,7 @@ module Pedant
     end
 
     ##
-    # Breaks the tree up into blocks and feeds them into block_parser
+    # Breaks the tree up into functions and feeds them into block_parser
     # @param file the current file being examined
     # @param tree the entire file tree
     ##
@@ -53,9 +53,13 @@ module Pedant
       ##
       def node_parser(bnode, found)
           if bnode.is_a?(Nasl::Call)
-            if (bnode.name.ident.name == "open_sock_tcp")
+            if (bnode.name.ident.name == "open_sock_tcp" ||
+                bnode.name.ident.name == "http_open_socket")
               found.add("")
-            elsif (bnode.name.ident.name == "close")
+            elsif (bnode.name.ident.name == "close" ||
+                   bnode.name.ident.name == "ftp_close" ||
+                   bnode.name.ident.name == "http_close_socket" ||
+                   bnode.name.ident.name == "smtp_close")
               # Check that this is an Lvalue. It could be a call or something
               # which is just too complicated to handle and doesn't really work
               # with our variable tracking system
@@ -69,7 +73,8 @@ module Pedant
               name = bnode.lval.ident.name;
             end
             if bnode.expr.is_a?(Nasl::Call)
-              if (bnode.expr.name.ident.name == "open_sock_tcp")
+              if (bnode.expr.name.ident.name == "open_sock_tcp" ||
+                  bnode.expr.name.ident.name == "http_open_socket")
                 found.add(name)
               end
             end
@@ -83,7 +88,8 @@ module Pedant
                   name = idents.lval.name
                 end
                 if idents.expr.is_a?(Nasl::Call)
-                  if (idents.expr.name.ident.name == "open_sock_tcp")
+                  if (idents.expr.name.ident.name == "open_sock_tcp" ||
+                      idents.expr.name.ident.name == "http_open_socket")
                     found.add(name)
                   end
                 end
@@ -108,6 +114,8 @@ module Pedant
             else
               found = node_parser(bnode.false, found);
             end
+          elsif bnode.is_a?(Nasl::Block)
+            found = block_parser(bnode.body, found);
           end
           return found
         end
@@ -128,10 +136,10 @@ module Pedant
       # Extract by the block. Will help us since we don't dive down into all
       # blocks as of yet (only if statements)
       allFound = Set.new
-      tree.all(:Block).each do |node|
+      tree.all(:Function).each do |node|
         allFound.merge(block_parser(node.body, Set.new))
       end
-      
+ 
       # The main body of a file is not a Block, so it must be considered
       # separately.
       allFound.merge(block_parser(tree, Set.new))
