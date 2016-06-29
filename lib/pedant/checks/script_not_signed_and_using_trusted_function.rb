@@ -188,7 +188,7 @@ module Pedant
         report(:warn, node.context())
         return fail
       end
-      report(:info, "Plugin isn't using a trusted function.")
+      report(:info, "Plugin is not using a trusted function.")
       pass
     end
   end
