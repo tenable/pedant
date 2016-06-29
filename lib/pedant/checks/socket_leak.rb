@@ -45,7 +45,12 @@ module Pedant
             if (bnode.name.ident.name == "open_sock_tcp")
               found.add("")
             elsif (bnode.name.ident.name == "close")
-              found = found - [bnode.args[0].expr.ident.name]
+              # Check that this is an Lvalue. It could be a call or something
+              # which is just too complicated to handle and doesn't really work
+              # with our variable tracking system
+              if bnode.args[0].expr.is_a?(Nasl::Lvalue)
+                found = found - [bnode.args[0].expr.ident.name]
+              end
             end
           elsif bnode.is_a?(Nasl::Assignment)
             name = ""
