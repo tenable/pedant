@@ -43,7 +43,7 @@ module Pedant
       audit_calls = []
       tree.all(:Call).each do |node|
         next unless node.name.ident.name == "audit"
-      	next if node.args.empty?
+        next if node.args.empty?
         audit_calls << node
       end
 
