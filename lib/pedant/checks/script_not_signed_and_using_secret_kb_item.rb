@@ -55,18 +55,16 @@ module Pedant
 
         # one case where we check all arguments
         if node.name.ident.name == "script_require_keys"
-          node.args.each { |arg|
+          node.args.each do |arg|
             arg = arg.expr
             arg = arg.lhs while arg.is_a? Nasl::Expression
             next unless arg.respond_to? :text
             next unless arg.text.index("Secret") == 0
             next if codes.index("#TRUSTED") == 0
-            report(
-              :warn,
-              "Plugin is accessing the secret KB item #{arg.text} and needs to be signed."
-            )
+            report(:warn, "Plugin is accessing the secret KB item \"#{arg.text}\" and needs to be signed. Add a #TRUSTED line to the start of your plugin to flag it for signing via Bamboo.")
+            report(:warn, arg.context())
             return fail
-          }
+          end
         end
 
         # every other function we need to check the first argument, or if the arguments are named, the 'name' argument
@@ -80,14 +78,12 @@ module Pedant
 
         if arg.text.index("Secret") == 0
           next if codes.index("#TRUSTED") == 0
-          report(
-            :warn,
-            "Plugin is accessing the secret KB item #{arg.text} and needs to be signed."
-          )
+          report(:warn, "Plugin is accessing the secret KB item \"#{arg.text}\" and needs to be signed. Add a #TRUSTED line to the start of your plugin to flag it for signing via Bamboo.")
+          report(:warn, arg.context())
           return fail
         end
       end
-      report(:info, "Plugin is not using an secret KB items without being signed.")
+      report(:info, "Plugin is not using secret KB items without being signed.")
       pass
     end
   end
