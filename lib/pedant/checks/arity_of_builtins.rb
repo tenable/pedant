@@ -30,22 +30,46 @@ module Pedant
   class CheckArityOfBuiltins < Check
     @@anon_arity_of_one = Set.new [
       "isnull",
+      # Sockets
+      "get_port_state",
+      "get_tcp_port_state",
+      "get_udp_port_state",
+      "close",
+      # String functions
+      "strlen",
+      "int",
+      "uint",
+      "chomp",
+      "ord",
+      "hex",
+      "hexstr",
+      "tolower",
+      "toupper",
+      "xmlparse",
+      # Time
       "usleep",
       "sleep",
+      # Arrays and lists
       "keys",
       "max_index",
+      "sort",
+      # Runtime checks
       "typeof",
+      "typeof_ex",
       "defined_func",
+      # Bignum functions
       "bn_dec2raw",
       "bn_raw2dec",
       "bn_hex2raw",
       "bn_raw2hex",
       "bn_sqr",
+      # File system
       "fread",
       "unlink",
       "readdir",
       "mkdir",
       "rmdir",
+      # Unkeyed hashes (crypto)
       "SHA",
       "SHA1",
       "SHA224",
@@ -56,6 +80,7 @@ module Pedant
       "MD2",
       "MD4",
       "MD5",
+      # Knowledge base
       "get_kb_item",
       "get_kb_list",
       "get_global_kb_item",
