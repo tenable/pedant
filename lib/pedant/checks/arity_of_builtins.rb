@@ -97,7 +97,7 @@ module Pedant
         name = call.name.ident.name
 
         if @@anon_arity_of_one.include? name
-          next unless call.args.length != 1 or call.args.first.type != :anonymous
+          next if call.args.length == 1 and call.args.first.type == :anonymous
           fail
           report(:error, "The builtin function '#{name}' takes a single anonymous argument.")
           # Pick the right thing to highlight.
