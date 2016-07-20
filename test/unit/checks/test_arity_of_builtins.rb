@@ -82,4 +82,20 @@ class TestArityOfBuiltins < Test::Unit::TestCase
       %q|get_kb_item("hello/", index:index);|
     )
   end
+
+  def test_make_array_odd
+    check(
+      :fail,
+      :CheckArityOfBuiltins,
+      %q|make_array(1, 2, 3);|
+    )
+  end
+
+  def test_make_array_even
+    check(
+      :pass,
+      :CheckArityOfBuiltins,
+      %q|make_array(1, 2, 3, 4);|
+    )
+  end
 end
