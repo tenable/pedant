@@ -109,7 +109,7 @@ module Pedant
 
     def self.run_all(opts, args)
       # Separate plugins and libraries from the rest of the arguments.
-      paths = args.select { |a| a =~ /(\/|\.(inc|nasl))$/ }
+      paths = args.select { |a| a =~ /(\/|\.(inc|nasl|pasl|tasl))$/ }
       args -= paths
 
       # If we have paths that aren't acceptable, there's a problem.
@@ -123,7 +123,7 @@ module Pedant
       paths.each do |path|
         begin
           Pathname.new(path).find do |dirent|
-            if dirent.file? && dirent.extname =~ /inc|nasl/
+            if dirent.file? && dirent.extname =~ /inc|nasl|pasl|tasl/
               dirents << dirent
             end
           end
