@@ -40,7 +40,16 @@ module Pedant
 
       return if tab_lines.length == 0
 
-      report(:warn, "Tabs were found in #{file}, on these lines: #{tab_lines.keys.sort.join(', ')}")
+      # Make the consecutive sequences friendlier to read
+      ranges = self.class.chunk_while(tab_lines.keys.sort) { |i, j| i + 1 == j }.map do |group|
+        if group.length == 1
+          group.first.to_s
+        else
+          "#{group.first.to_s}-#{group.last.to_s}"
+        end
+      end
+
+      report(:warn, "Tabs were found in #{file}, on these lines: #{ranges.join(', ')}")
       report(:warn, "Showing up to five lines:")
       tab_lines.keys.sort.first(5).each do |linenum|
         report(:warn, "#{linenum}: #{tab_lines[linenum].gsub(/\t/, Rainbow("    ").background(:red))}")
@@ -55,6 +64,23 @@ module Pedant
 
       # Run this check on the code in every file.
       @kb[:codes].each { |file, code| check(file, code) }
+    end
+
+    # Enumerable#chunk_while in Ruby 2.3 would remove the need for this
+    def self.chunk_while enumerable
+      # If we're passed an array or something...
+      enumerable = enumerable.to_enum unless enumerable.respond_to? :next
+
+      chunks = [[enumerable.next]] rescue [[]]
+      loop do
+        elem = enumerable.next
+        if yield chunks.last.last, elem
+          chunks[-1] << elem
+        else
+          chunks << [elem]
+        end
+      end
+      return chunks
     end
   end
 end

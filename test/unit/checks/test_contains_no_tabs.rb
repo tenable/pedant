@@ -42,4 +42,26 @@ class TestContainsNoTabs < Test::Unit::TestCase
       %Q|\t|
     )
   end
+
+  def test_line_squashing
+    assert_equal(
+      Pedant::CheckContainsNoTabs.chunk_while([1, 2, 3, 5, 6]) { |i, j| i + 1 == j },
+      [[1, 2, 3], [5, 6]]
+    )
+
+    assert_equal(
+      Pedant::CheckContainsNoTabs.chunk_while([1, 3, 5]) { |i, j| i + 1 == j },
+      [[1], [3], [5]]
+    )
+
+    assert_equal(
+      Pedant::CheckContainsNoTabs.chunk_while([1]) { |i, j| i + 1 == j },
+      [[1]]
+    )
+
+    assert_equal(
+      Pedant::CheckContainsNoTabs.chunk_while([]) { |i, j| i + 1 == j },
+      [[]]
+    )
+  end
 end
