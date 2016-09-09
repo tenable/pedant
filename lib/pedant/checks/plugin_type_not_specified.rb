@@ -26,8 +26,15 @@
 
 module Pedant
   class CheckPluginTypeNotSpecified < Check
+
+    @@valid_types = ['combined', 'local', 'reputation', 'remote', 'settings', 'summary', 'thirdparty']
+
     def self.requires
       super + [:main, :trees]
+    end
+
+    def self.provides
+      super + @@valid_types.map {|t| "plugin_type_#{t}".to_sym}
     end
 
     def run
@@ -53,10 +60,14 @@ module Pedant
         next if !arg.is_a? Nasl::String
 
         # Ensure that the plugin type is valid.
-        unless ['combined', 'local', 'reputation', 'remote', 'settings', 'summary', 'thirdparty'].include? arg.text
-          report(:info, "Plugin is of unknown type #{arg.text}:\n#{arg.context(node)}")
+        type = arg.text
+        unless @@valid_types.include? type
+          report(:info, "Plugin is of unknown type #{type}:\n#{arg.context(node)}")
           return fail
         end
+
+        # Turn the plugin type into a symbol on which other checks can depend.
+        @kb["plugin_type_#{type}".to_sym] = true
 
         args << [arg, node]
       end
