@@ -62,10 +62,10 @@ module Pedant
           tree = Nasl::Parser.new.parse(contents, path)
           @kb[:trees][file] = tree
           report(:info, "Parsed contents of #{path}.")
-        rescue Nasl::ParseException, Nasl::TokenException
-          # XXX-MAK: Incorporate the error from the parser, as it gives full,
-          # coloured context.
+        rescue Nasl::ParseException, Nasl::TokenException => e
           report(:error, "Failed to parse #{path}.")
+          report(:error, e.message)
+          report(:error, e.backtrace)
           return fatal
         end
       end
