@@ -59,6 +59,24 @@ class TestFlippedOperandsOnMatchOrSubstring < Test::Unit::TestCase
     )
   end
 
+  # get_kb_item() returns a string and nobody stores regexes or substrings
+  # in the KB, so treat this as a special case.
+  def test_get_kb_item
+    check(
+      :warn,
+      :CheckFlippedOperandsOnMatchOrSubstring,
+      %q|if (get_kb_item("whatever") >< "Windows");|
+    )
+  end
+
+  def test_some_other_function
+    check(
+      :pass,
+      :CheckFlippedOperandsOnMatchOrSubstring,
+      %q|if (get_substring_for_key("whatever") >< "Windows");|
+    )
+  end
+
   def test_simple_match
     check(
       :warn,
