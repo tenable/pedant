@@ -97,6 +97,17 @@ class TestContainsUnreachableCode < Test::Unit::TestCase
     )
   end
 
+  # Plugins that are deprecated will have a bit of code inserted to
+  # prevent the body of the plugin from running. We should not flag
+  # this specific call to exit().
+  def test_deprecated_plugin_exit
+    check(
+      :pass,
+      :CheckContainsUnreachableCode,
+      %q|{ exit(0, "This plugin has been deprecated"); foo(); }|
+    )
+  end
+
   # exit() is a special case in this check, because it's a function instead of a
   # language keyword.
   def test_indexed_exit

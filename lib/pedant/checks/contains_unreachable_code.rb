@@ -33,6 +33,19 @@ module Pedant
     def check(file, tree)
       def check_statements(file, list)
         list.each do |node|
+          # Is this an exit() call that's used to deprecate the plugin? If so,
+          # we'll ignore it and check the rest of the plugin.
+          # These look like:
+          #   exit(0, "This plugin has been deprecated");
+          # Some plugins (like the Slackware plugins) just do: exit(0);
+          # But, they are old and have been deprecated forever and will
+          # probably never be changed or reenabled.
+          next if node.is_a?(Nasl::Call) and
+            node.name.ident.name == 'exit' and
+            node.args.length == 2 and
+            node.args[1].expr.is_a?(Nasl::String) and
+            node.args[1].expr.text =~ /plugin has been deprecated|patch has been replaced/i
+
           # Check if the Node is capable of jumping out of the Block, without
           # resuming where it left off (i.e., Call). The exception is exit(),
           # which is a builtin Function that terminates execution.
